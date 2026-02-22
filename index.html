@@ -2,854 +2,753 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ева и Полина: Алабуга</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ЧАУУ! — Итальянское Приключение</title>
+    <meta name="description" content="Визуальная новелла про Еву и Полину, которые вместо Алабуги попали в Италию!">
+    <meta name="theme-color" content="#0d0014">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Nunito:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
+        :root {
+            --pink: #FF3C78;
+            --gold: #FFD600;
+            --teal: #00E5C4;
+            --purple: #7B2FBE;
+            --dark: #0d0014;
+            --card: rgba(18, 6, 30, 0.92);
+            --border: rgba(255, 60, 120, 0.5);
+            --text: #f0e6ff;
+            --font-display: 'Unbounded', sans-serif;
+            --font-body: 'Nunito', sans-serif;
         }
 
-        body {
-            font-family: 'Segoe UI', 'Arial', 'Helvetica', sans-serif;
-            background: #1A1A2E;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 12px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
-        .game-container {
-            max-width: 950px;
-            width: 100%;
-            background: #16213e;
-            border-radius: 12px;
-            box-shadow: 0 20px 30px rgba(0,0,0,0.6);
-            border: 4px solid #FF6B9D;
+        html, body {
+            width: 100%; height: 100%;
+            background: var(--dark);
+            color: var(--text);
+            font-family: var(--font-body);
             overflow: hidden;
         }
 
-        #bg-music {
-            display: none;
+        .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s, transform 0.4s; }
+        .screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.96); }
+
+        /* SCREAMER */
+        #screamer {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: #000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.05s;
+        }
+        #screamer.active { opacity: 1; pointer-events: all; }
+        #screamer-text {
+            font-family: var(--font-display); font-size: clamp(4rem,12vw,9rem);
+            color: red; text-shadow: 0 0 40px red, 0 0 80px red;
+            animation: scream 0.08s infinite;
+        }
+        @keyframes scream { 0%,100%{transform:scale(1) rotate(-3deg)} 50%{transform:scale(1.08) rotate(3deg)} }
+
+        /* BG CANVAS */
+        #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* ══ TITLE ══ */
+        #screen-title {
+            z-index: 10;
+            background: radial-gradient(ellipse at 50% 70%, #1a0033 0%, var(--dark) 70%);
+        }
+        .title-glow { text-align: center; padding: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        .title-main {
+            font-family: var(--font-display); font-size: clamp(2.8rem, 11vw, 6.5rem); font-weight: 900;
+            background: linear-gradient(135deg, var(--pink), var(--gold), var(--teal));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            line-height: 1.1; letter-spacing: -2px;
+        }
+        .title-sub { font-size: clamp(0.8rem, 3vw, 1.1rem); color: rgba(255,255,255,0.55); margin-top: 8px; letter-spacing: 4px; text-transform: uppercase; }
+        .title-desc { max-width: 500px; margin: 16px auto; font-size: clamp(0.85rem, 2.5vw, 1rem); color: rgba(255,255,255,0.72); line-height: 1.6; text-align: center; padding: 0 20px; }
+        .btn-start {
+            margin-top: 24px; padding: 16px 48px;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            border: none; border-radius: 50px; cursor: pointer;
+            font-family: var(--font-display); font-size: clamp(0.9rem, 3vw, 1.2rem); font-weight: 700;
+            color: white; letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 0 40px rgba(255,60,120,0.6), 0 4px 20px rgba(0,0,0,0.5);
+            transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .btn-start:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 60px rgba(255,60,120,0.8); }
+        .title-chars { display:flex; gap:16px; justify-content:center; margin-top:20px; flex-wrap:wrap; padding:0 16px; }
+        .title-char-avatar { width:50px; height:50px; border-radius:50%; border:2px solid var(--pink); object-fit:cover; transition:transform 0.2s; }
+        .title-char-avatar:hover { transform:scale(1.15); }
+
+        /* ══ SELECT ══ */
+        #screen-select {
+            z-index: 10;
+            background: radial-gradient(ellipse at 30% 50%, #0a0022 0%, var(--dark) 60%);
+            overflow-y: auto; padding: 16px; align-items: flex-start; justify-content: flex-start;
+        }
+        .select-title { text-align: center; width: 100%; font-family: var(--font-display); font-size: clamp(1.1rem, 4vw, 1.8rem); color: var(--gold); margin-bottom: 4px; padding-top: 8px; }
+        .select-subtitle { text-align:center; width:100%; color:rgba(255,255,255,0.45); font-size:0.85rem; margin-bottom:16px; }
+        .chars-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; width:100%; max-width:720px; margin:0 auto; }
+        .char-card {
+            background: var(--card); border: 2px solid rgba(255,60,120,0.25);
+            border-radius: 16px; padding: 14px 10px; text-align: center;
+            cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+        }
+        .char-card:hover { border-color: var(--pink); transform: translateY(-5px); box-shadow: 0 10px 35px rgba(255,60,120,0.3); }
+        .char-card.selected { border-color: var(--gold); box-shadow: 0 0 28px rgba(255,214,0,0.4); }
+        .char-avatar { width:74px; height:74px; border-radius:50%; object-fit:cover; border:3px solid var(--pink); margin-bottom:8px; }
+        .char-name { font-family:var(--font-display); font-size:0.75rem; color:var(--gold); margin-bottom:5px; font-weight:700; }
+        .char-desc { font-size:0.72rem; color:rgba(255,255,255,0.62); line-height:1.4; }
+        .char-badge { position:absolute; top:7px; right:7px; font-size:1.1rem; }
+        .char-tag { display:inline-block; background:rgba(255,60,120,0.15); border:1px solid var(--pink); border-radius:20px; font-size:0.62rem; padding:2px 7px; margin-top:5px; color:var(--pink); }
+        .btn-play-char {
+            display:block; margin:18px auto 10px; padding:13px 38px;
+            background:linear-gradient(135deg,var(--gold),#ff9500);
+            border:none; border-radius:50px; cursor:pointer;
+            font-family:var(--font-display); font-size:0.95rem; font-weight:700; color:var(--dark);
+            box-shadow:0 0 28px rgba(255,214,0,0.4); transition:all 0.2s;
+        }
+        .btn-play-char:hover { transform:translateY(-3px); box-shadow:0 0 48px rgba(255,214,0,0.6); }
+        .btn-play-char:disabled { opacity:0.4; pointer-events:none; }
+
+        /* ══ GAME ══ */
+        #screen-game { z-index: 10; padding: 0; background: var(--dark); flex-direction: column; justify-content: flex-start; overflow: hidden; }
+
+        .game-bg {
+            position: relative; width: 100%; flex: 0 0 auto;
+            height: clamp(180px, 38vw, 340px);
+            background-size: cover; background-position: center;
+            transition: background-image 0.5s; overflow: hidden;
+        }
+        .game-bg::after {
+            content:''; position:absolute; inset:0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(13,0,20,0.92) 100%);
         }
 
-        .scene {
-            background-size: cover;
-            background-position: center;
-            min-height: 360px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 16px;
-            position: relative;
-            transition: background-image 0.3s;
-            background-color: #0f3460;
-            box-shadow: inset 0 -60px 50px -20px black;
+        .game-hud { position: absolute; top: 0; left: 0; right: 0; z-index: 10; display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; pointer-events: none; }
+        .hud-pill { background: rgba(13,0,20,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,60,120,0.35); border-radius: 20px; padding: 4px 10px; font-family: var(--font-display); font-size: 0.58rem; color: var(--pink); text-transform: uppercase; letter-spacing: 1px; pointer-events: all; }
+        .hud-right { display:flex; gap:6px; flex-direction:column; align-items:flex-end; }
+        .hud-score { color: var(--gold); }
+
+        .scene-chars { position: absolute; bottom: 0; right: 0; z-index: 8; display: flex; gap: 6px; padding: 6px; }
+        .scene-char-bubble { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .scene-char-img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid var(--pink); }
+        .scene-char-name { font-size: 0.52rem; color: white; text-align: center; font-family: var(--font-display); }
+
+        .game-dialogue { flex: 1; overflow-y: auto; padding: 12px 12px 0; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+        .chapter-title { font-family: var(--font-display); font-size: 0.68rem; color: var(--pink); text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+        .chapter-title::after { content:''; flex:1; height:1px; background:rgba(255,60,120,0.25); }
+        .story-box { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 14px; font-size: clamp(0.82rem, 2.4vw, 0.97rem); line-height: 1.7; color: var(--text); backdrop-filter: blur(4px); }
+        .story-box.highlight { border-color: var(--gold); background: rgba(255,214,0,0.07); }
+        .speaker-label { font-family: var(--font-display); font-size: 0.62rem; color: var(--teal); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .game-choices { padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 7px; }
+        .choice-question { font-family: var(--font-display); font-size: 0.72rem; color: var(--gold); text-align: center; margin-bottom: 3px; }
+        .choices-row { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; }
+        .choice-btn {
+            flex: 1; min-width: 90px; max-width: 200px;
+            background: rgba(255,60,120,0.1); border: 1.5px solid rgba(255,60,120,0.3);
+            border-radius: 11px; padding: 9px 12px; cursor: pointer;
+            font-family: var(--font-body); font-size: clamp(0.78rem, 2.4vw, 0.92rem); font-weight: 700;
+            color: var(--text); transition: all 0.18s; text-align: center; -webkit-appearance: none;
+        }
+        .choice-btn:hover, .choice-btn:active { background:rgba(255,60,120,0.28); border-color:var(--pink); transform:translateY(-2px); }
+        .choice-btn.correct { background:rgba(0,229,196,0.18); border-color:var(--teal); color:var(--teal); }
+        .choice-btn.wrong { background:rgba(255,60,120,0.2); border-color:var(--pink); animation:shake 0.3s; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+        .choice-btn.disabled { opacity:0.45; pointer-events:none; }
+
+        .minigame-box { background: var(--card); border: 1.5px dashed rgba(255,214,0,0.4); border-radius: 14px; padding: 12px; text-align: center; }
+        .minigame-title { font-family:var(--font-display); color:var(--gold); font-size:0.75rem; margin-bottom:8px; }
+        .big-tap-btn { font-size: 2.4rem; background: none; border: none; cursor: pointer; animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.18)} }
+        .tap-counter { font-family:var(--font-display); font-size:1.9rem; color:var(--gold); margin:6px 0; }
+        .tap-progress { height:5px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; margin-top:6px; }
+        .tap-progress-bar { height:100%; background:linear-gradient(90deg,var(--pink),var(--gold)); border-radius:3px; transition:width 0.15s; }
+
+        .game-nav { display: flex; gap: 9px; padding: 9px 12px 12px; border-top: 1px solid rgba(255,60,120,0.12); }
+        .nav-btn { flex: 1; padding: 11px; border: none; border-radius: 11px; cursor: pointer; font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; transition: all 0.18s; }
+        .nav-btn-prev { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.45); }
+        .nav-btn-prev:hover { background:rgba(255,255,255,0.13); color:white; }
+        .nav-btn-next { background:linear-gradient(135deg,var(--pink),var(--purple)); color:white; box-shadow:0 4px 18px rgba(255,60,120,0.4); }
+        .nav-btn-next:hover { transform:translateY(-2px); box-shadow:0 6px 28px rgba(255,60,120,0.6); }
+        .nav-btn:disabled { opacity:0.3; pointer-events:none; }
+
+        .game-topbar { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; border-bottom: 1px solid rgba(255,60,120,0.12); background: var(--dark); flex-shrink: 0; }
+        .topbar-left { display:flex; gap:8px; align-items:center; }
+        .topbar-hero { display:flex; align-items:center; gap:7px; }
+        .topbar-hero-img { width:30px; height:30px; border-radius:50%; border:2px solid var(--pink); object-fit:cover; }
+        .topbar-hero-name { font-family:var(--font-display); font-size:0.62rem; color:var(--pink); }
+        .topbar-right { display:flex; gap:6px; align-items:center; }
+        .topbar-btn { background:none; border:none; cursor:pointer; font-size:1.1rem; padding:4px; opacity:0.68; transition:opacity 0.18s; }
+        .topbar-btn:hover { opacity:1; }
+        .progress-bar { height: 3px; background: rgba(255,60,120,0.18); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--gold)); transition: width 0.45s; }
+
+        /* ══ END ══ */
+        #screen-end { z-index: 10; background: radial-gradient(ellipse at 50% 50%, #1a0033 0%, var(--dark) 70%); text-align: center; padding: 20px; overflow-y: auto; }
+        .end-emoji { font-size: 3.5rem; margin-bottom: 8px; display: block; }
+        .end-title { font-family:var(--font-display); font-size:clamp(1.4rem,5vw,2.3rem); color:var(--gold); margin-bottom:8px; }
+        .end-desc { color:rgba(255,255,255,0.68); line-height:1.6; margin-bottom:16px; max-width:480px; font-size:0.92rem; }
+        .end-personality { background:var(--card); border:2px solid var(--gold); border-radius:16px; padding:18px; margin:14px auto; max-width:380px; }
+        .end-personality-img { width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); margin-bottom:8px; }
+        .end-personality-name { font-family:var(--font-display); font-size:0.95rem; color:var(--gold); margin-bottom:5px; }
+        .achievements-list { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin:10px 0; }
+        .ach-chip { background: rgba(255,214,0,0.1); border: 1px solid rgba(255,214,0,0.4); border-radius: 20px; padding: 3px 10px; font-size:0.72rem; color:var(--gold); }
+        .end-btns { display:flex; flex-direction:column; gap:9px; max-width:280px; margin:0 auto; }
+        .btn-other-char { padding:11px; background:linear-gradient(135deg,var(--teal),#0090ff); border:none; border-radius:11px; color:var(--dark); font-family:var(--font-display); font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+        .btn-other-char:hover { transform:translateY(-2px); }
+        .btn-restart { padding:11px; background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.18); border-radius:11px; color:white; font-family:var(--font-display); font-size:0.82rem; cursor:pointer; }
+
+        /* ══ ACH PANEL ══ */
+        #ach-panel { position: fixed; top: 0; right: -330px; width: 310px; height: 100%; background: var(--card); border-left: 1px solid var(--border); z-index: 100; padding: 18px; overflow-y: auto; transition: right 0.3s; backdrop-filter: blur(12px); }
+        #ach-panel.open { right: 0; }
+        .ach-panel-title { font-family:var(--font-display); color:var(--gold); font-size:0.95rem; margin-bottom:14px; }
+        .ach-item { display:flex; gap:10px; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,60,120,0.1); }
+        .ach-icon { font-size:1.4rem; flex-shrink:0; }
+        .ach-name { font-family:var(--font-display); font-size:0.68rem; color:var(--gold); }
+        .ach-desc { font-size:0.72rem; color:rgba(255,255,255,0.48); margin-top:2px; }
+        .ach-locked .ach-icon, .ach-locked .ach-name, .ach-locked .ach-desc { opacity:0.28; filter:grayscale(1); }
+        .ach-close { position:absolute; top:14px; right:14px; background:none; border:none; color:white; font-size:1.4rem; cursor:pointer; }
+
+        /* ── TOAST ── */
+        #ach-toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); border: 2px solid var(--gold); border-radius: 14px; padding: 10px 18px; display: flex; gap: 10px; align-items: center; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; z-index: 200; opacity: 0; min-width: 240px; max-width: 88vw; }
+        #ach-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { font-size: 1.7rem; }
+        .toast-text { font-family:var(--font-display); font-size:0.68rem; color:var(--gold); }
+        .toast-name { font-size:0.82rem; }
+
+        /* ── LYRICS ── */
+        #lyrics-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(13,0,20,0.82); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,214,0,0.25); padding: 5px 12px; text-align: center; transition: opacity 0.5s; }
+        #lyrics-text { font-family:var(--font-display); font-size:clamp(0.58rem,1.8vw,0.75rem); color:var(--gold); }
+
+        /* ── MUSIC FAB ── */
+        #music-fab { position: fixed; bottom: 38px; right: 12px; z-index: 60; width: 42px; height: 42px; border-radius: 50%; background: rgba(13,0,20,0.78); border: 1.5px solid rgba(255,60,120,0.35); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.2s; }
+        #music-fab:hover { border-color:var(--pink); }
+
+        /* ── FLASH ── */
+        #flash { position:fixed; inset:0; z-index:5000; background:white; opacity:0; pointer-events:none; }
+
+        /* ── BURST ── */
+        .ciao-burst { position: fixed; pointer-events: none; z-index: 500; font-family: var(--font-display); font-size: 1.8rem; color: var(--gold); text-shadow: 0 0 18px var(--gold); animation: burst 0.75s forwards; }
+        @keyframes burst { 0%{opacity:1;transform:scale(0.5) translateY(0)} 100%{opacity:0;transform:scale(1.4) translateY(-55px)} }
+
+        @media (min-width: 600px) {
+            #screen-game { max-width: 540px; left: 50%; transform: translateX(-50%); }
+            #screen-game.hidden { transform: translateX(-50%) scale(0.96); }
         }
 
-        .scene::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .content {
-            position: relative;
-            z-index: 5;
-        }
-
-        .story-text {
-            background: rgba(26, 26, 46, 0.95);
-            backdrop-filter: blur(4px);
-            border: 2px solid #FF6B9D;
-            border-radius: 12px;
-            padding: 20px;
-            color: white;
-            font-size: 1.2rem;
-            text-align: left;
-            margin-bottom: 16px;
-            font-family: 'Comic Neue', cursive;
-            line-height: 1.5;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .song-line {
-            background: rgba(26, 26, 46, 0.9);
-            backdrop-filter: blur(4px);
-            border: 2px solid #FF6B9D;
-            border-radius: 12px;
-            padding: 14px 20px;
-            color: white;
-            font-size: 1.3rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 16px;
-            font-family: 'Rubik Glitch', cursive;
-        }
-
-        .character-row {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .character-card {
-            background: #1A1A2E;
-            border-radius: 12px;
-            padding: 8px 16px;
-            border: 2px solid #FF6B9D;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-            font-family: 'Comic Neue', cursive;
-        }
-
-        .character-card img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #FF6B9D;
-            object-fit: cover;
-        }
-
-        .interactive-area {
-            background: #1A1A2E;
-            padding: 20px;
-            border-top: 4px solid #FF6B9D;
-        }
-
-        .puzzle-box {
-            background: #16213e;
-            border-radius: 12px;
-            padding: 20px;
-            border: 2px dashed #FF6B9D;
-            text-align: center;
-        }
-
-        .puzzle-title {
-            color: #FF6B9D;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            font-family: 'Rubik Glitch', cursive;
-        }
-
-        .puzzle-options {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .puzzle-btn {
-            background: #2a3d6b;
-            border: none;
-            border-bottom: 4px solid #102030;
-            color: white;
-            padding: 12px 20px;
-            font-size: 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.05s linear;
-            font-family: 'Comic Neue', cursive;
-            font-weight: bold;
-            min-width: 120px;
-        }
-
-        .puzzle-btn:active {
-            transform: translateY(4px);
-            border-bottom-width: 2px;
-        }
-
-        .puzzle-btn.special {
-            background: #FF6B9D;
-            font-size: 1.4rem;
-        }
-
-        .puzzle-btn.epstein {
-            background: gold;
-            color: black;
-            font-size: 1.5rem;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .feedback {
-            background: #222;
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 16px;
-            border: 2px solid gold;
-            color: white;
-            font-family: 'Comic Neue', cursive;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 16px;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: #533e6b;
-            border: none;
-            border-bottom: 4px solid #2a1e3a;
-            color: white;
-            font-size: 1.3rem;
-            padding: 8px 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: 'Comic Neue', cursive;
-            flex: 1;
-        }
-
-        .nav-btn.start-btn {
-            background: #FF6B9D;
-            border-bottom: 4px solid #b3456b;
-            font-size: 1.8rem;
-            padding: 15px;
-        }
-
-        .nav-btn.restart-btn {
-            background: gold;
-            color: black;
-            border-bottom: 4px solid #b8860b;
-        }
-
-        .nav-btn:active {
-            transform: translateY(4px);
-            border-bottom-width: 2px;
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .alabuga-counter {
-            font-size: 2rem;
-            color: gold;
-            text-shadow: 2px 2px 0 #FF6B9D;
-        }
-
-        .mode-indicator {
-            background: #FF6B9D;
-            color: #1A1A2E;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,60,120,0.28); border-radius: 2px; }
     </style>
 </head>
 <body>
-    <audio id="bg-music" loop>
-        <source src="assets/audio/song.mp3" type="audio/mpeg">
-    </audio>
 
-    <div class="game-container">
-        <div class="scene" id="scene">
-            <div class="content">
-                <div class="song-line" id="lineText">👋 ДОБРО ПОЖАЛОВАТЬ!</div>
-                <div class="character-row" id="characterRow"></div>
-                <div class="story-text" id="storyText" style="display: none;"></div>
+<div id="flash"></div>
+<div id="screamer"><div id="screamer-text">😱</div></div>
+<canvas id="bg-canvas"></canvas>
+
+<div id="ach-toast">
+    <div class="toast-icon" id="toast-icon">🏆</div>
+    <div class="toast-text">
+        <div>Достижение разблокировано!</div>
+        <div class="toast-name" id="toast-name"></div>
+    </div>
+</div>
+
+<div id="ach-panel">
+    <button class="ach-close" id="ach-close">✕</button>
+    <div class="ach-panel-title">🏆 Достижения</div>
+    <div id="ach-list"></div>
+</div>
+
+<div id="music-fab" title="Музыка">🎵</div>
+<div id="lyrics-bar" style="display:none;"><div id="lyrics-text"></div></div>
+<audio id="bg-music" loop><source src="assets/audio/song.mp3" type="audio/mpeg"></audio>
+
+<!-- TITLE -->
+<div class="screen" id="screen-title">
+    <div class="title-glow">
+        <div class="title-main">ЧАУУ!</div>
+        <div class="title-sub">Итальянское Приключение</div>
+        <div class="title-desc">Ева и Полина летели в Алабугу Политех, но попали в Италию! Одна история — пять взглядов. Выбери своего героя!</div>
+        <div class="title-chars" id="title-chars-preview"></div>
+        <button class="btn-start" id="btn-to-select">▶ НАЧАТЬ ИГРУ</button>
+    </div>
+</div>
+
+<!-- SELECT -->
+<div class="screen hidden" id="screen-select">
+    <div class="select-title">👤 Выбери персонажа</div>
+    <div class="select-subtitle">Одна история — с разных сторон</div>
+    <div class="chars-grid" id="chars-grid"></div>
+    <button class="btn-play-char" id="btn-play-char" disabled>Играть за выбранного ▶</button>
+</div>
+
+<!-- GAME -->
+<div class="screen hidden" id="screen-game">
+    <div class="game-topbar">
+        <div class="topbar-left">
+            <div class="topbar-hero">
+                <img src="" id="topbar-hero-img" class="topbar-hero-img" alt="">
+                <span id="topbar-hero-name" class="topbar-hero-name"></span>
             </div>
         </div>
-
-        <div class="interactive-area">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="color:#FF6B9D;">📍 <span id="sceneName">МЕНЮ</span></span>
-                <span style="color:#FF6B9D;">🎤 <span id="stepCounter">0/21</span></span>
-            </div>
-
-            <div id="modeIndicator" class="mode-indicator">🎮 РЕЖИМ: МЕНЮ</div>
-
-            <div id="puzzleContainer" class="puzzle-box">
-                <div class="puzzle-title">🔮 ДЕЙСТВИЕ</div>
-                <div id="puzzleContent">
-                    <div style="text-align: center; padding: 20px;">
-                        <img src="assets/avatars/eva_avatar.jpg.jpg" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #FF6B9D; margin: 5px;">
-                        <img src="assets/avatars/polina_avatar.jpg.jpg" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #FF6B9D; margin: 5px;">
-                        <p style="color: white; margin: 20px 0; font-size: 1.2rem;">Ева и Полина ждут тебя!</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="nav-buttons">
-                <button class="nav-btn start-btn" id="startBtn">🚀 НАЧАТЬ ИГРУ</button>
-                <button class="nav-btn restart-btn hidden" id="restartBtn">🔄 ЗАНОВО</button>
-            </div>
-            <div class="nav-buttons" id="gameNav" style="display: none;">
-                <button class="nav-btn" id="prevBtn" disabled>◀ НАЗАД</button>
-                <button class="nav-btn" id="nextBtn">ДАЛЕЕ ▶</button>
-            </div>
+        <div class="topbar-right">
+            <button class="topbar-btn" id="btn-ach" title="Достижения">🏆</button>
+            <button class="topbar-btn" id="btn-menu" title="Меню">☰</button>
         </div>
     </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="game-bg" id="game-bg">
+        <div class="game-hud">
+            <div class="hud-pill" id="hud-chapter">Глава 1</div>
+            <div class="hud-right"><div class="hud-pill hud-score" id="hud-score">⭐ 0</div></div>
+        </div>
+        <div class="scene-chars" id="scene-chars"></div>
+    </div>
+    <div class="game-dialogue" id="game-dialogue"></div>
+    <div class="game-choices" id="game-choices"></div>
+    <div class="game-nav">
+        <button class="nav-btn nav-btn-prev" id="btn-prev" disabled>◀ НАЗАД</button>
+        <button class="nav-btn nav-btn-next" id="btn-next">ДАЛЕЕ ▶</button>
+    </div>
+</div>
 
-    <script>
-        // ==================== СЦЕНЫ ====================
-        const scenes = [
-            { // 0
-                line: "✈️ Алабуга или Италия?",
-                bg: "assets/backgrounds/1_alabuga.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" },
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "🤯 Ева и Полина летели в Алабугу Политех, но случайно попали в Италию на Олимпиаду. Полина говорит: 'Слышь, это не Алабуга, тут тепло'. А Ева: 'Да ладно, ща разберёмся!'. Итальянцы вокруг машут руками и орут 'Чау!'. Девочки такие: 'О, нас узнают!'. Короче, приключение начинается...",
-                puzzle: { type: "choice", question: "Что сказать итальянцам?", options: ["ЧАУ 🤌", "ГДЕ АЛАБУГА? 🤷", "ОЛИМПИАДА? 🏅"], correct: 0 }
-            },
-            { // 1
-                line: "🏐 Волейбол зимой?",
-                bg: "assets/backgrounds/2_volleyball.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" },
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "🏐 Фигурное катание уже прошло. Ева орёт: 'Пошли на волейбол!'. Полина выпадает в осадок: 'Ты дура? Какая зимой волейбол?'. Ева: 'Это ж Италия, тут всегда волейбол! Чемпион Италии, поняла? Вдуленька!'. Полина вздыхает и идёт за ней, потому что спорить с Евой бесполезно...",
-                puzzle: { type: "choice", question: "Кто прав?", options: ["ЕВА 🔥", "ПОЛИНА ❄️", "НИКТО 🤡"], correct: 0 }
-            },
-            { // 2
-                line: "🤌 Урок итальянского",
-                bg: "assets/backgrounds/3_ciao.jpg.jpg",
-                characters: [
-                    { name: "Местный", img: "assets/avatars/italian_avatar.jpg.jpg" }
-                ],
-                story: "🗣️ Девочки подходят к местному, чтобы спросить дорогу. Мужик оборачивается... А ЭТО ЖЕ... НУ ТЫ ПОНЯЛ! ТОТ САМЫЙ! В ШЛЯПЕ! Полина: 'Ой, а я его по телику видела!'. Ева: 'Ты чо, это же... О_о'. Мужик улыбается и говорит: 'Чау, беллы! Хотите на остров?'. Девочки переглянулись и решили, что лучше просто поучить итальянский...",
-                puzzle: { type: "epstein", question: "ЧТО ДЕЛАТЬ?!", options: ["БЕЖАТЬ 🏃", "СКАЗАТЬ ЧАУ 🤌", "СПРОСИТЬ ПРО ОСТРОВ 🏝️"], correct: 1 }
-            },
-            { // 3
-                line: "🇷🇺 Русский мат в Италии",
-                bg: "assets/backgrounds/4_shout.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" }
-                ],
-                story: "😱 Наши проигрывают! Ева вскакивает и начинает орать матом на весь стадион по-русски. Полина закрывает лицо руками и шипит: 'Тише, нас сейчас депортируют!'. Ева: 'Да плевать, пусть знают наших!'. Весь сектор в шоке оборачивается. И тут сзади раздаётся: 'Девушки, вы русские?'. Ой...",
-                puzzle: { type: "shout", question: "ЧТО КРИКНУТЬ?", options: ["КЛАССИЧЕСКИЙ МАТ 🔞", "ТУРБО МАТ 💥", "МАТ С АКЦЕНТОМ 🎭"], correct: 0 }
-            },
-            { // 4
-                line: "👀 Знакомство со звёздами",
-                bg: "assets/backgrounds/5_meet.jpg.jpg",
-                characters: [],
-                story: "🌟 Девочки оборачиваются, а там... Илья Малинин и Пётр Гуменников! Настоящие фигуристы! Полина начинает икать от неожиданности, Ева краснеет как рак. Илья: 'Вы откуда тут? Сколько вам лет?'. Полина: 'Мы... это... в Алабугу летели...'. Пётр ржёт: 'Далеко забрались!'. Илья: 'Пойдёмте с нами, покажем вам Италию!'. Ева: 'А вы не маньяки?'. Пётр: 'Мы фигуристы, мы только на льду опасны'.",
-                puzzle: { type: "choice", question: "Пойти с ними?", options: ["ДА! 👍", "НЕТ 👎", "ТОЛЬКО ЕСЛИ ПОКАТАЕТЕ 🛷"], correct: 0 }
-            },
-            { // 5
-                line: "🧠 Великий стратег",
-                bg: "assets/backgrounds/6_strateg.jpg.jpg",
-                characters: [
-                    { name: "Петя", img: "assets/avatars/petya_avatar.jpg.jpg" }
-                ],
-                story: "🤔 Полина ляпает: 'А правда, что Пётр Зедр раздавал ЕГЭ?'. Петя Гуменник делает умное лицо: 'Это стратегический вопрос. Я как стратег скажу: ЕГЭ раздавать нельзя, а вот показательные выступления - можно!'. Илья закатывает глаза: 'Опять ты со своей стратегией'. Петя: 'Это не стратегия, это план! Сначала мы едим пиццу, потом идём на гондолу, потом...'. Илья: 'Стратег, блин'.",
-                puzzle: { type: "strateg", question: "Какой план Пети?", options: ["СТРАТЕГИЧЕСКИЙ 🧠", "БАМБЛБИ 🤖", "СЪЕСТЬ ПИЦЦУ 🍕"], correct: 2 }
-            },
-            { // 6
-                line: "🤖 Трансформеры на льду",
-                bg: "assets/backgrounds/7_bamblebee.jpg.jpg",
-                characters: [
-                    { name: "Илья", img: "assets/avatars/ilya_avatar.jpg.jpg" }
-                ],
-                story: "⚡ Илья: 'Кстати, на показательных мы с Петей выступаем в костюмах трансформеров!'. Полина: 'Чего?'. Илья: 'Бамблби! Жёлтенький такой, с ушками'. Ева: 'ХОЧУ БАМБЛБИ!'. Петя: 'Я буду в синем, стратегический цвет'. Ева: 'А можно померить?'. Илья: 'Ну... давайте, но осторожно!'. Ева напяливает костюм Бамблби и начинает прыгать по льду. Полина снимает на телефон. Пётр: 'Это не по плану!'. Илья: 'Расслабься, стратег'.",
-                puzzle: { type: "click", question: "НАЖМИ НА БАМБЛБИ!", options: ["БАМ 🐝", "БЛБИ 🐝", "ТРАНСФОРМ 🚗"], correct: 0 }
-            },
-            { // 7
-                line: "🧳 Потерянный чемодан",
-                bg: "assets/backgrounds/8_luggage.jpg.jpg",
-                characters: [
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "😭 Полина: 'ГДЕ МОЙ ЧЕМОДАН?'. Ева: 'Ты его в Алабуге забыла'. Полина: 'МЫ В ИТАЛИИ!'. Начинается паника. Они бегают по аэропорту, хватают чужие чемоданы, итальянцы орут 'Мадонна!'. Полина садится на пол и говорит: 'Всё, я тут живу'. Ева тащит её за руку: 'Пошли искать, стратег нашёлся'. Вдруг видят - их чемодан стоит прямо у выхода, а на нём записка: 'Ciao, belle!'. Полина: 'Нас любят в Италии!'.",
-                puzzle: { type: "click", question: "ГДЕ ЧЕМОДАН?", options: ["ТАМ 👉", "ЗДЕСЬ 👇", "ВОН ТАМ 👆"], correct: 0 }
-            },
-            { // 8
-                line: "🔥 Олимпийский огонь",
-                bg: "assets/backgrounds/9_fire.jpg.jpg",
-                characters: [],
-                story: "🏃‍♀️ Девочки видят Олимпийский огонь. Ева: 'Давай зажжём!'. Полина: 'Ты чо, это святыня!'. Ева: 'А я святее!'. Подбегает охрана. Ева делает вид, что просто дышит рядом. Полина шепчет: 'Отойди, позорище'. Ева: 'Это стратегия отхода!'. Охранник смотрит на них, улыбается и говорит: 'Чау! Фото?'. Ева: 'О, с нами сфоткаться хочет!'. Полина: 'Он думает мы туристки... хотя мы и есть туристки'.",
-                puzzle: { type: "choice", question: "Зажечь огонь?", options: ["ДА! 🔥", "НЕТ 🙅", "ФОТО 📸"], correct: 2 }
-            },
-            { // 9
-                line: "🍕 Пицца найс",
-                bg: "assets/backgrounds/10_pizza.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" }
-                ],
-                story: "🍕 Ева унюхала пиццу за километр. 'ПОЛИНА, ПИЦЦА!'. Они врываются в пиццерию. Ева заказывает: 'Чау! Пицца!'. Итальянец: 'Гранде?'. Ева: 'ГРАНДЕ!'. Приносят пиццу размером с Еву. Полина: 'Мы это не съедим'. Ева: 'Съедим, не ной'. Через час. Ева: 'Я больше никогда...'. Полина: 'А говорила'. Ева: 'Но оно того стоило!'.",
-                puzzle: { type: "pizza", question: "ЧТО ДЕЛАТЬ С ПИЦЦЕЙ?", options: ["СЪЕСТЬ 🍕", "ЗАБРАТЬ СОБОЙ 🥡", "ПОДЕЛИТЬСЯ С ПЕТЕЙ 🧠"], correct: 0 }
-            },
-            { // 10
-                line: "🔍 Полина потерялась",
-                bg: "assets/backgrounds/11_lost.jpg.jpg",
-                characters: [
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "😵 Ева: 'Полина, ты где?'. Тишина. Ева: 'ПОЛИНА!'. Голос из толпы: 'АУ!'. Ева бежит на звук. Полина стоит у фонтана и кормит голубей. Ева: 'Ты чо ушла?'. Полина: 'А чо, голуби есть хотят'. Ева: 'Они тут элитные, итальянские голуби!'. Полина: 'И чо? Голуби везде голуби'. Ева: 'Пошли уже, а то без нас улетят'.",
-                puzzle: { type: "choice", question: "Что сказать Полине?", options: ["АУ! 🗣️", "ЧАУ! 🤌", "ПОШЛИ! 🚶"], correct: 2 }
-            },
-            { // 11
-                line: "⛸️ Знакомство с фигуристами",
-                bg: "assets/backgrounds/12_skaters.jpg.jpg",
-                characters: [
-                    { name: "Илья", img: "assets/avatars/ilya_avatar.jpg.jpg" },
-                    { name: "Петя", img: "assets/avatars/petya_avatar.jpg.jpg" }
-                ],
-                story: "🫂 Илья: 'Девчонки, а пойдёмте на лёд!'. Ева: 'Мы не умеем'. Пётр: 'Я научу! У меня стратегия обучения - сначала падать, потом ездить'. Полина: 'А больно?'. Илья: 'Терпимо'. Через 10 минут. Ева на льду: 'ДЕРЖИТЕ МЕНЯ!'. Полина ползком: 'Я лучше так'. Пётр: 'Прогресс! Вы уже ближе ко льду, чем большинство'.",
-                puzzle: { type: "choice", question: "Кто круче на льду?", options: ["ИЛЬЯ 🤩", "ПЕТЯ 🧠", "ОБА 🔥"], correct: 2 }
-            },
-            { // 12
-                line: "📚 Русский мат: продвинутый уровень",
-                bg: "assets/backgrounds/13_russian.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" }
-                ],
-                story: "📖 Итальянцы просят: 'Научите нас русскому мату!'. Ева: 'Легко! Повторяйте: ...'. Полина: 'Ты чо, нельзя!'. Ева: 'Они просят культурно обогатиться'. Итальянцы старательно записывают. Пётр: 'Это стратегическая ошибка'. Илья: 'Это прикол'. Через час итальянцы орут матом на весь стадион, думая что это приветствие. Ева гордится собой.",
-                puzzle: { type: "shout", question: "ЧЕМУ НАУЧИТЬ?", options: ["БАЗЕ 🔰", "ПРОДВИНУТОМУ 📈", "ЭКСПЕРТНОМУ 💀"], correct: 1 }
-            },
-            { // 13
-                line: "👮 Итальянская полиция",
-                bg: "assets/backgrounds/14_police.jpg.jpg",
-                characters: [],
-                story: "🚔 К ним подходят полицейские. 'Документы!'. Ева лезет в карман, достаёт жвачку. Полина: 'Это не документ'. Ева: 'А чо, вкусная же'. Полина показывает паспорт. Полицейский: 'Русси?'. Ева: 'Да! А чо?'. Полицейский улыбается: 'Чау!'. Ева: 'Чау!'. Полицейский уходит. Полина: 'Это сработало?'. Ева: 'Чау - магическое слово'.",
-                puzzle: { type: "choice", question: "Что сказать полиции?", options: ["ЧАУ! 🤌", "ИЗВИНИТЕ 🙏", "АЛАБУГА! 🏫"], correct: 0 }
-            },
-            { // 14
-                line: "🛍️ Сувенирная лихорадка",
-                bg: "assets/backgrounds/15_souvenir.jpg.jpg",
-                characters: [
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "💰 Полина: 'ХОЧУ ВАЗУ!'. Ева: 'У нас денег нет'. Полина: 'А я хочу!'. Ева: 'Торгуйся'. Полина подходит к продавцу: 'Чау! Сколько?'. Продавец: '100 евро'. Полина: '10 евро'. Продавец: 'Мадонна! 90'. Полина: '11'. Продавец: '80'. Полина: '12'. Через час они сошлись на 15. Продавец плачет, но доволен. Полина с вазой счастлива. Ева: 'Ты гений переговоров'. Полина: 'Я знаю'.",
-                puzzle: { type: "click", question: "Купить сувенир?", options: ["ВАЗУ 🏺", "МАГНИТИК 🧲", "ПИЦЦУ 🍕"], correct: 0 }
-            },
-            { // 15
-                line: "📸 Фанаты с плакатами",
-                bg: "assets/backgrounds/16_fans.jpg.jpg",
-                characters: [],
-                story: "📢 Фанаты узнали Илью и Петю. 'ИЛЬЯ! ПЕТЯ! АВТОГРАФ!'. Ева: 'О, нас тоже узнали!'. Полина: 'Это не нас, это их'. Ева: 'А мы с ними, значит тоже звёзды'. Подходит фанат: 'Девушки, вы с ними?'. Ева: 'Да!'. Фанат: 'Сфоткаться можно?'. Ева: 'Легко!'. Полина: 'Нас теперь тоже узнавать будут'. Ева: 'Мы знамениты!'.",
-                puzzle: { type: "choice", question: "Раздавать автографы?", options: ["ДА 📝", "НЕТ ✋", "ТОЛЬКО ЗА ПИЦЦУ 🍕"], correct: 2 }
-            },
-            { // 16
-                line: "🚣 Гондола",
-                bg: "assets/backgrounds/17_gondola.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" }
-                ],
-                story: "🛶 Ева: 'ХОЧУ НА ГОНДОЛЕ!'. Полина: 'Это дорого'. Ева: 'А мы уговорим!'. Подходят к гондольеру. Ева: 'Чау! Бесплатно?'. Гондольер смеётся. Ева: 'Ну пожалуйста, мы русские туристки!'. Гондольер: 'Садитесь, красавицы'. Полина: 'Это работает?'. Ева: 'Чау и обаяние - наше всё'. Плывут, поют 'Санта Лючия'. Полина: 'Я счастлива'. Ева: 'Я тоже'.",
-                puzzle: { type: "gondola", question: "Что делать в гондоле?", options: ["ПЕТЬ 🎤", "ГРЕСТИ 🚣", "ЦЕЛОВАТЬСЯ 😘"], correct: 0 }
-            },
-            { // 17
-                line: "🏠 Домой, в Алабугу!",
-                bg: "assets/backgrounds/18_home.jpg.jpg",
-                characters: [
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "😢 Полина: 'Я хочу домой... В Алабугу...'. Ева: 'Мы же в Италии!'. Полина: 'А я по русскому снегу соскучилась'. Ева: 'Здесь тепло, вино, пицца...'. Полина: 'А там - Алабуга Политех!'. Ева вздыхает: 'Ладно, поехали домой. Но сначала ещё одна пицца'. Полина: 'Договорились'.",
-                puzzle: { type: "choice", question: "Едем домой?", options: ["ДА ✈️", "НЕТ 🍕", "СПРОСИМ У ПЕТИ 🧠"], correct: 0 }
-            },
-            { // 18
-                line: "🧳 Сборы в аэропорту",
-                bg: "assets/backgrounds/19_airport.jpg.jpg",
-                characters: [],
-                story: "🎒 Ева: 'Где мои носки?'. Полина: 'В чемодане'. Ева: 'Где чемодан?'. Полина: 'Ты его потеряла'. Ева: 'А, точно. Новые куплю'. Полина: 'Там сувениры, ваза, пицца...'. Ева: 'Пиццу съела'. Полина: 'Когда?'. Ева: 'Ночью'. Полина: 'Ты монстр'. Ева: 'Я голодный монстр. Пошли, самолёт улетит'.",
-                puzzle: { type: "pack", question: "Что берём с собой?", options: ["СУВЕНИРЫ 🎁", "ПИЦЦУ 🍕", "БАМБЛБИ 🤖"], correct: 0 }
-            },
-            { // 19
-                line: "✈️ Посадка на рейс",
-                bg: "assets/backgrounds/20_boarding.jpg.jpg",
-                characters: [
-                    { name: "Ева", img: "assets/avatars/eva_avatar.jpg.jpg" },
-                    { name: "Полина", img: "assets/avatars/polina_avatar.jpg.jpg" }
-                ],
-                story: "🛫 Стюардесса: 'Посадка на рейс до Алабуги'. Ева: 'УРА!'. Полина: 'Наконец-то!'. Илья и Петя машут им: 'Приезжайте ещё!'. Ева: 'А вы к нам в Алабугу!'. Пётр: 'Это стратегически важно!'. Илья закатывает глаза. Девочки заходят в самолёт. Полина: 'Это было круто'. Ева: 'Ага. Но Алабуга круче'. Полина: 'Алабуга - сила!'.",
-                puzzle: { type: "board", question: "Заходим в самолёт?", options: ["ДА ✈️", "НЕТ, ЕЩЁ ПИЦЦЫ 🍕", "СФОТКАТЬСЯ НА ПАМЯТЬ 📸"], correct: 0 }
-            },
-            { // 20 (финал)
-                line: "⚡ АЛАБУГА ПОЛИТЕХ ЖДЁТ!",
-                bg: "assets/backgrounds/21_alabuga_final.jpg.jpg",
-                characters: [],
-                story: "🏫 Девочки вернулись в Алабугу! Их встречают с плакатами: 'С ВОЗВРАЩЕНИЕМ!'. Ева: 'Ну чо, скучали?'. Все: 'ДА!'. Полина: 'Мы вам сувениры привезли!'. Раздают вазы, магнитики, пиццу (да, Ева спрятала). Пётр (откуда-то из толпы): 'Это было стратегически успешное путешествие!'. Илья: 'Ты как здесь?'. Пётр: 'Стратегически прилетел раньше'. Все смеются. Алабуга - навсегда! НО... ЧТОБЫ СТАТЬ НАСТОЯЩИМ ЖИТЕЛЕМ АЛАБУГИ, НУЖНО НАЖАТЬ НА КНОПКУ 10 РАЗ!",
-                puzzle: { type: "alabuga", required: 10, question: "НАЖМИ 10 РАЗ НА АЛАБУГУ!" }
-            }
-        ];
+<!-- END -->
+<div class="screen hidden" id="screen-end">
+    <span class="end-emoji" id="end-emoji">🎉</span>
+    <div class="end-title" id="end-title">КОНЕЦ!</div>
+    <div class="end-desc" id="end-desc"></div>
+    <div class="end-personality" id="end-personality"></div>
+    <div class="achievements-list" id="end-achievements"></div>
+    <div class="end-btns">
+        <button class="btn-other-char" id="btn-try-other">🔄 Пройти за другого персонажа</button>
+        <button class="btn-restart" id="btn-restart-same">↩ Заново за того же</button>
+    </div>
+</div>
 
-        // ==================== ЛИЧНОСТИ ====================
-        const personalities = [
-            { name: "ТЫ СЕГОДНЯ ЕВА", desc: "Громкая, импульсивная, любишь волейбол и пиццу!", img: "assets/finals/eva_final.jpg.jpg" },
-            { name: "ТЫ СЕГОДНЯ ПОЛИНА", desc: "Спокойная, но тупишь, обожаешь 'Чау' и сувениры!", img: "assets/finals/polina_final.jpg.jpg" },
-            { name: "ТЫ ПЕТЯ ГУМЕННИК", desc: "Стратег, всё по плану! Даже ЕГЭ раздавал по стратегии!", img: "assets/finals/petya_final.jpg.jpg" },
-            { name: "ТЫ ИЛЬЯ МАЛИНИН", desc: "Четверные прыгаешь, звезда, любишь Бамблби!", img: "assets/finals/ilya_final.jpg.jpg" }
-        ];
+<script>
+const HEROES = [
+    { id:'eva', name:'Ева', img:'assets/avatars/eva_avatar.jpg.jpg', finalImg:'assets/finals/eva_final.jpg.jpg', emoji:'🔥', tag:'Хаотичный добряк', desc:'Громкая, импульсивная, искренне убеждена что волейбол — зимний вид спорта. Её "чау" слышит весь стадион.' },
+    { id:'polina', name:'Полина', img:'assets/avatars/polina_avatar.jpg.jpg', finalImg:'assets/finals/polina_final.jpg.jpg', emoji:'🌸', tag:'Здравый смысл', desc:'Старается сохранить рассудок пока Ева творит хаос. Мастер торговли и голубиный друг.' },
+    { id:'petya', name:'Петя', img:'assets/avatars/petya_avatar.jpg.jpg', finalImg:'assets/finals/petya_final.jpg.jpg', emoji:'🧠', tag:'Стратег', desc:'Всё по плану! Пётр Гуменников — стратег от Бога. Даже встреча с туристками входила в план.' },
+    { id:'ilya', name:'Илья', img:'assets/avatars/ilya_avatar.jpg.jpg', finalImg:'assets/finals/ilya_final.jpg.jpg', emoji:'⚡', tag:'Звезда', desc:'Илья Малинин — четверные прыгает с закрытыми глазами. Любит Бамблби и искренних людей.' },
+    { id:'local', name:'Местный', img:'assets/avatars/italian_avatar.jpg.jpg', finalImg:'assets/avatars/italian_avatar.jpg.jpg', emoji:'🏝️', tag:'Загадочный', desc:'Тот самый. В шляпе. Говорит про остров. Для самых отважных — секретная линия.' }
+];
 
-        // ==================== СОСТОЯНИЕ ====================
-        let currentScene = 0;
-        let ciaoCount = 0;
-        let alabugaCount = 0;
-        let feedbackMsg = "";
-        let finalPersonality = null;
-        let musicPlayed = false;
-        let gameStarted = false;
-        let showingStory = true; // true = показываем текст, false = показываем игру
+const SCENES = {
+    eva: [
+        { chapter:'Глава 1 — Великий Перелёт', bg:'assets/backgrounds/1_alabuga.jpg.jpg', chars:['eva','polina'], title:'Алабуга? Нет — Италия!', speaker:'Ева', text:'🤯 Ну и что, что не Алабуга?! Вижу солнце, море и мужиков в костюмах. Значит — Олимпиада! Полина ноет что-то про "не тот аэропорт"... Пффф. Говорю: не теряй момент! А вокруг все орут "Чау!" — ну явно нас узнали!', type:'story' },
+        { chapter:'Глава 1 — Великий Перелёт', bg:'assets/backgrounds/1_alabuga.jpg.jpg', chars:['eva','polina'], title:'Первый выбор', speaker:'Ева', text:'Итальянец машет рукой и кричит что-то. Надо ответить!', type:'choice', question:'🤌 Что ответить итальянцу?', options:['ЧАУ! 🤌','Где Алабуга? 🏫','RUSSIA 🇷🇺'], correct:0, correctFeedback:'✅ Правильно! "Чау" — это магия! Итальянец расплылся в улыбке!', wrongFeedback:'❌ Итальянец смотрит с непониманием... Попробуем снова?', achievementOnCorrect:'ciao_master' },
+        { chapter:'Глава 2 — Волейбол Зимой', bg:'assets/backgrounds/2_volleyball.jpg.jpg', chars:['eva','polina'], title:'Фигурного нет — зато волейбол!', speaker:'Ева', text:'🏐 Полина: "Фигурное катание уже прошло". Я: "Пофиг! Зато тут ВОЛЕЙБОЛ!"\nПолина: "Какой волейбол на ЗИМНЕЙ Олимпиаде?!"\nЯ: "Это Италия, тут всегда волейбол. Вдуленька!"\nПолина вздохнула и пошла за мной. Она просто не понимает. Пока.', type:'story' },
+        { chapter:'Глава 3 — Тот Самый Местный', bg:'assets/backgrounds/3_ciao.jpg.jpg', chars:['local'], title:'КТО ЭТО?!', speaker:'Ева (внутренний голос)', text:'😱 Мы подошли спросить дорогу, а мужик оборачивается и это... ТОТ САМЫЙ. В шляпе!\nОн улыбается: "Чау, belle! Хотите на мой остров?"\nВнутри меня всё кричит БЕЖАТЬ...', type:'choice', question:'😱 Что ответить МЕСТНОМУ?', options:['БЕЖАТЬ! 🏃','Чау! (и уйти) 🤌','На какой остров? 🏝️'], correct:1, correctFeedback:'✅ Умно! Быстро "Чау" и растворились в толпе.', wrongFeedback:'❌ Опасно... К счастью Полина потащила прочь.', screamer:true, achievementOnCorrect:'first_screamer' },
+        { chapter:'Глава 4 — Русский Мат на Весь Стадион', bg:'assets/backgrounds/4_shout.jpg.jpg', chars:['eva'], title:'НАШИ ПРОИГРЫВАЮТ!!!', speaker:'Ева', text:'💢 Наши проигрывают! Встаю и... всё, понеслась! Ору на всё поле по-русски.\nПолина закрыла лицо. Итальянцы оборачиваются.\nИ тут сзади: "Девочки... вы русские?"\nМы обернулись. Там стоят ДВА красивых мужика.', type:'tap', question:'💢 Покричи за наших! (нажми 7 раз)', tapTarget:7, tapEmoji:'📣', completeFeedback:'🔥 ААААА! Итальянцы в шоке. Наши забили гол. Это Ева.', achievementOnComplete:'loud_eva' },
+        { chapter:'Глава 5 — Знакомство', bg:'assets/backgrounds/5_meet.jpg.jpg', chars:['ilya','petya'], title:'ИЛЬЯ И ПЕТЯ?!', speaker:'Ева', text:'🌟 Это Илья Малинин и Пётр Гуменников! Настоящие!\nПервое что выпалила: "А это правда что Пётр 7 раз сдавал ЕГЭ?"\nПолина: "ЕВА!!!"\nПётр засмеялся. Илья засмеялся. Я спаслась.', type:'story' },
+        { chapter:'Глава 6 — Стратег', bg:'assets/backgrounds/6_strateg.jpg.jpg', chars:['petya'], title:'Петя Строит Планы', speaker:'Ева', text:'🧠 Петя: "Стратегически нам нужно: сначала пицца, потом гондола, потом..."\nИлья: "Стратег, они просто хотят Италию посмотреть"\nПетя: "Пицца — это и есть Италия. Стратегически верно."\nЯ: "Я люблю этого человека". Полина: "ЕВА!!!"', type:'story' },
+        { chapter:'Глава 7 — Бамблби', bg:'assets/backgrounds/7_bamblebee.jpg.jpg', chars:['ilya'], title:'ПРИМЕРИТЬ БАМБЛБИ!', speaker:'Ева', text:'🤖 Илья показывает костюм Бамблби для показательных. Не могу. ХОЧУ.\n"Можно примерить?"\n"Осторожно только"\nНапяливаю и прыгаю по льду. Полина снимает. Петя: "Не по плану". Илья смеётся.\nЛучший момент в жизни.', type:'tap', question:'🤖 Попрыгай в костюме Бамблби! (5 раз)', tapTarget:5, tapEmoji:'🤖', completeFeedback:'⚡ БАМ-БЛ-БИ! Ева в образе. Петя пишет в блокноте "незапланированная радость — принять".', achievementOnComplete:'bumblebee' },
+        { chapter:'Глава 8 — Пицца', bg:'assets/backgrounds/10_pizza.jpg.jpg', chars:['eva'], title:'Пицца Размером с Меня', speaker:'Ева', text:'🍕 Учуяла пиццу за километр. "ПОЛИНА, ПИЦЦА!"\n"Чау! Гранде!"\nПринесли пиццу размером со мной.\nЧерез час: "Больше никогда". Полина: "А говорила". Я: "Но оно того стоило".', type:'choice', question:'🍕 Что делать с гигантской пиццей?', options:['Съесть всё! 🍕','Поделиться 🤝','Взять с собой 🥡'], correct:0, correctFeedback:'✅ Конечно съесть всё! Ева не сдаётся!', wrongFeedback:'❌ Ева внутри не согласна... она всё равно доела.' },
+        { chapter:'Глава 9 — Гондола', bg:'assets/backgrounds/17_gondola.jpg.jpg', chars:['eva'], title:'Гондола Любой Ценой', speaker:'Ева', text:'🛶 "ХОЧУ ГОНДОЛУ!"\n"Это дорого"\n"Мы уговорим!"\n"Чау! Бесплатно?"\nГондольер смеётся.\n"Ну пожалуйста, мы русские туристки!"\nОн: "Садитесь, красавицы."\nМы плывём и поём "Санта Лючия". Счастье!', type:'story' },
+        { chapter:'Финал — Алабуга!', bg:'assets/backgrounds/21_alabuga_final.jpg.jpg', chars:['eva','polina'], title:'Алабуга Политех Ждёт!', speaker:'Ева', text:'✈️ Вернулись! Нас встречают с плакатами!\nРаздаю сувениры, пиццу (спрятала в сумке — и что?)\nИлья написал "Возвращайтесь!" Петя: "Стратегически успешно".\nЯ написала: "ЧАУУ!!!"\nАлабуга навсегда! Но Италия — в сердце!', type:'tap', question:'🏫 Нажми 10 раз на Алабугу!', tapTarget:10, tapEmoji:'🏫', completeFeedback:'🎉 АЛАБУГА ПОЛИТЕХ ФОРЕВА! Ева стала легендой двух стран!', achievementOnComplete:'alabuga_hero', isLast:true }
+    ],
+    polina: [
+        { chapter:'Глава 1 — Где Мы?!', bg:'assets/backgrounds/1_alabuga.jpg.jpg', chars:['polina','eva'], title:'Это точно не Алабуга', speaker:'Полина', text:'😰 Я сразу поняла — мы не там. Солнце, море, итальянцы орут по-итальянски.\nЕва: "О! Нас узнали!"\nЯ: "Ева. Мы. В. Италии."\nЕва: "Ну и что, тут Олимпиада! Пошли!"\nВздыхаю и иду за ней. Это будет долгий день.', type:'story' },
+        { chapter:'Глава 1 — Где Мы?!', bg:'assets/backgrounds/1_alabuga.jpg.jpg', chars:['polina'], title:'Сориентироваться', speaker:'Полина', text:'Пока Ева общается с итальянцами — надо что-то придумать...', type:'choice', question:'🗺️ Как действовать?', options:['Найти аэропорт 🛫','Сказать "Чау" 🤌','Погуглить 📱'], correct:1, correctFeedback:'✅ Правильно! Сначала освоиться. Интернета всё равно нет.', wrongFeedback:'❌ Интернет не работает... Придётся полагаться на "Чау".' },
+        { chapter:'Глава 2 — Волейбол', bg:'assets/backgrounds/2_volleyball.jpg.jpg', chars:['polina','eva'], title:'Какой Волейбол?!', speaker:'Полина', text:'🏐 Ева: "Пошли на волейбол!"\nЯ объясняю спокойно: "Ева. Зимняя Олимпиада. Волейбол — летний вид."\nЕва: "Вдуленька!"\nОна уже бежит к стадиону. Ладно. Пусть. Хотя бы не потеряется... надеюсь.', type:'story' },
+        { chapter:'Глава 3 — Местный', bg:'assets/backgrounds/3_ciao.jpg.jpg', chars:['local'], title:'ЭТО КТО?!', speaker:'Полина', text:'😱 Я его сразу узнала. По телику видела. Этот человек говорит про остров...\nНам надо уйти. Сейчас. Быстро. Красиво.', type:'choice', question:'😱 Как уйти от МЕСТНОГО?', options:['Резко убежать 🏃','"Чау" и раствориться 🤌','Позвонить 112 📞'], correct:1, correctFeedback:'✅ Элегантно! "Чау" и исчезли как профессионалы.', wrongFeedback:'❌ Неловко... но главное — ушли.', screamer:true, achievementOnCorrect:'first_screamer' },
+        { chapter:'Глава 4 — Ева Кричит', bg:'assets/backgrounds/4_shout.jpg.jpg', chars:['polina'], title:'Ева Орёт на Весь Стадион', speaker:'Полина', text:'😳 Ева встала и начала орать матом по-русски на весь стадион.\nЯ закрыла лицо руками.\nИтальянцы смотрят. Охрана смотрит.\nЯ делаю вид что не знаю эту девушку.\nИ тут сзади: "Девушки, вы русские?"\nПоднимаю взгляд. Два красивых мужика.', type:'story' },
+        { chapter:'Глава 5 — Знакомство', bg:'assets/backgrounds/5_meet.jpg.jpg', chars:['ilya','petya'], title:'Оказывается — Звёзды', speaker:'Полина', text:'🌟 Илья Малинин и Пётр Гуменников. Фигуристы. Я знаю кто они.\nЕва сразу: "Это правда что вы 7 раз ЕГЭ сдавали?"\nЯ: "ЕВА!"\nПётр засмеялся. Илья: "Хотите Италию посмотреть?"\nЯ: "Ну... пожалуй."', type:'story' },
+        { chapter:'Глава 6 — Стратег', bg:'assets/backgrounds/6_strateg.jpg.jpg', chars:['petya'], title:'Петя — Мой Человек', speaker:'Полина', text:'🧠 Петя говорит строить планы — и я СОГЛАСНА.\nНаконец хоть кто-то думает!\n"Пицца, гондола, показательные"\nЯ: "Разумно. Мне нравится этот человек".\nЕва: "О, и ты тоже?"\nЯ: "По-другому. Он план строит."', type:'choice', question:'📋 Чей план лучше?', options:['Петин (пицца→гондола) 🧠','Евин (всё сразу) 🔥','Мой (аэропорт) 🛫'], correct:0, correctFeedback:'✅ Правильно! Структура — это сила.', wrongFeedback:'❌ Петя лучше знает.' },
+        { chapter:'Глава 7 — Чемодан', bg:'assets/backgrounds/8_luggage.jpg.jpg', chars:['polina'], title:'МОЙ ЧЕМОДАН!', speaker:'Полина', text:'😭 ГДЕ МОЙ ЧЕМОДАН?!\nЕва: "В Алабуге забыла"\nЯ: "МЫ В ИТАЛИИ!"\nБегаем по аэропорту. Итальянцы: "Мадонна!"\nСажусь на пол: "Всё. Я тут живу."\nИ тут видим — чемодан стоит у выхода. На нём записка: "Ciao, belle! 💋"', type:'tap', question:'🔍 Ищи чемодан! (8 раз)', tapTarget:8, tapEmoji:'🔍', completeFeedback:'🧳 Нашла! Итальянцы добрые люди.', achievementOnComplete:'detective_polina' },
+        { chapter:'Глава 8 — Сувениры', bg:'assets/backgrounds/15_souvenir.jpg.jpg', chars:['polina'], title:'Я Хочу Эту Вазу', speaker:'Полина', text:'🏺 Идеальная ваза. 100 евро — много.\nПрименяю навык переговоров:\n"Чау! Сколько?"\n"100 евро"\n"10 евро"\n"Мадонна! 90!"\n"11!"\n...\nЧерез 40 минут — 15 евро.\nПродавец плакал. Ева: "Ты гений". Я: "Я знаю".', type:'tap', question:'🏺 Торгуйся! (9 раз)', tapTarget:9, tapEmoji:'💰', completeFeedback:'🏺 Ваза куплена за 15 евро! Торговля — это искусство.', achievementOnComplete:'master_trader' },
+        { chapter:'Финал — Дом', bg:'assets/backgrounds/21_alabuga_final.jpg.jpg', chars:['polina','eva'], title:'Наконец-то Алабуга', speaker:'Полина', text:'🏫 Мы дома. Я рада. Нас встречают.\nЕва раздаёт сувениры. Откуда-то пицца (взяла с собой — конечно).\nПетя написал: "Стратегически успешно". Илья: "Приезжайте!"\nЯ написала: "Спасибо за Италию 🤌"\nА потом пошла спать. Заслужила.', type:'tap', question:'🏠 Домой! (10 раз)', tapTarget:10, tapEmoji:'🏠', completeFeedback:'🎉 Полина вернулась! Спокойная, с вазой и историей на всю жизнь.', achievementOnComplete:'alabuga_hero', isLast:true }
+    ],
+    petya: [
+        { chapter:'Пролог — Стратегия', bg:'assets/backgrounds/6_strateg.jpg.jpg', chars:['petya'], title:'Всё По Плану', speaker:'Петя', text:'🧠 Мы с Ильёй в Италии. Мой план:\n1. Прибыть\n2. Тренировка\n3. Пицца (стратегически необходима)\n4. Показательные\n5. Домой\nПотом появились эти девочки. И план пришлось... адаптировать.', type:'story' },
+        { chapter:'Глава 1 — КТО ОРЁТ?', bg:'assets/backgrounds/4_shout.jpg.jpg', chars:['ilya','petya'], title:'Русские На Стадионе', speaker:'Петя', text:'📣 На волейболе кто-то орёт по-русски.\nГромко. Очень громко.\nИлья: "Это русские!"\nЯ: "Стратегически — надо познакомиться."\nИлья: "Ты хочешь познакомиться потому что они орут мат?"\nЯ: "Нет. Потому что они искренние. Это ценно."', type:'story' },
+        { chapter:'Глава 2 — Знакомство', bg:'assets/backgrounds/5_meet.jpg.jpg', chars:['petya','ilya'], title:'Добрый День', speaker:'Петя', text:'🌟 Подходим. Первый вопрос от рыжей:\n"Это правда что вы 7 раз ЕГЭ сдавали?"\nЯ: "Стратегически — это была оценка системы. Оценил 7 раз."\nОна: "Что?"\nЯ: "Нет, неправда. Но звучит красиво."\nОна засмеялась. Стратегия сработала.', type:'choice', question:'🧠 Как ответить на вопрос про ЕГЭ?', options:['С юмором 😄','Стратегически 📊','Честно 💯'], correct:0, correctFeedback:'✅ Юмор — стратегически верно!', wrongFeedback:'❌ Слишком серьёзно. Скорректировал тактику.' },
+        { chapter:'Глава 3 — Бамблби', bg:'assets/backgrounds/7_bamblebee.jpg.jpg', chars:['petya','ilya'], title:'Незапланированная Радость', speaker:'Петя', text:'🤖 Показываю костюм. Ева хочет примерить.\nЯ: "Это не по плану"\nИлья: "Расслабься"\nЕва надевает и прыгает по льду. Все смеются.\nЗаписываю: "Незапланированная радость — принять. Люди важнее плана."', type:'story' },
+        { chapter:'Глава 4 — Местный', bg:'assets/backgrounds/3_ciao.jpg.jpg', chars:['local'], title:'Этот Здесь Не Случайно', speaker:'Петя', text:'😶 Я его узнал сразу. Записал в блокноте: "Не взаимодействовать. Уйти. Чау."\nДевочки тянутся к нему. Хватаю Илью:\n"Нам нужно уйти"\nИлья: "Почему?"\nЯ: "Стратегически."', type:'choice', question:'😶 Как увести всех от МЕСТНОГО?', options:['Сказать правду 😱','"Пошли пиццу есть!" 🍕','Дёрнуть за рукав 👋'], correct:1, correctFeedback:'✅ Пицца — универсальный аргумент. Все пошли.', wrongFeedback:'❌ Лучше пицца. Всегда пицца.', screamer:true, achievementOnCorrect:'first_screamer' },
+        { chapter:'Глава 5 — Лёд', bg:'assets/backgrounds/12_skaters.jpg.jpg', chars:['petya','ilya'], title:'Обучение По Плану', speaker:'Петя', text:'⛸️ Учу девочек. Мой метод:\n1. Теория (5 мин)\n2. Показ (2 мин)\n3. Падение (неизбежно)\n4. Повтор\nЕва слушала 10 секунд и уже на льду: "ДЕРЖИТЕ МЕНЯ!"\nЗаписываю: "Теория работает не для всех. Принять."', type:'tap', question:'📝 Объясни технику! (6 раз)', tapTarget:6, tapEmoji:'📝', completeFeedback:'🧠 Теория передана! Ева не слушала. Полина записала. Считается.' },
+        { chapter:'Финал — Показательные', bg:'assets/backgrounds/21_alabuga_final.jpg.jpg', chars:['petya','ilya'], title:'Трансформеры На Льду', speaker:'Петя', text:'🤖 Мы выступили. Я в синем, Илья в жёлтом. Бамблби.\nЕва в зале орала "ПЕТЯЯЯ! СИНИЙ БАМБЛБИ!"\nЗаписываю последнее: "Встреча с Евой и Полиной — не по плану. Итог — лучшее что было в Италии. Пересмотреть определение плана."', type:'tap', question:'🤖 Выступи! (10 раз)', tapTarget:10, tapEmoji:'🤖', completeFeedback:'⚡ ТРАНСФОРМЕРЫ НА ЛЬДУ! Стадион взрывается!', achievementOnComplete:'alabuga_hero', isLast:true }
+    ],
+    ilya: [
+        { chapter:'Пролог', bg:'assets/backgrounds/12_skaters.jpg.jpg', chars:['ilya'], title:'Тренировка. Потом — Неожиданность.', speaker:'Илья', text:'⚡ С Петей в Италии. Он строит планы — я катаюсь.\nПотом на стадионе кто-то заорал по-русски.\nГромко. Искренне. Я таких болельщиков не слышал давно.\nПетя: "Надо познакомиться"\nЯ: "Это ТЫ так говоришь?"\nПетя: "Стратегически — да"', type:'story' },
+        { chapter:'Глава 1 — Знакомство', bg:'assets/backgrounds/5_meet.jpg.jpg', chars:['ilya','petya'], title:'Русские В Италии', speaker:'Илья', text:'🌟 Подходим. Первый вопрос:\n"Это правда что вы 7 раз ЕГЭ сдавали?"\nЯ засмеялся. Реально. Первый раз так смеялся в Италии.\nОни классные. Сразу видно — настоящие.', type:'choice', question:'⚡ Что предложить русским туристкам?', options:['Поехать вместе! 🎉','Дать автограф 📝','Сфоткаться 📸'], correct:0, correctFeedback:'✅ Поехать вместе! Это лучшее решение.', wrongFeedback:'❌ Автограф потом. Сначала дружба.' },
+        { chapter:'Глава 2 — Бамблби', bg:'assets/backgrounds/7_bamblebee.jpg.jpg', chars:['ilya'], title:'Костюм Примеряют', speaker:'Илья', text:'🤖 Рассказал про показательные. Ева: "МОЖНО ПРИМЕРИТЬ?"\nСказал "осторожно только".\nОна надела и прыгает по льду. Полина снимает. Смеёмся все.\nПетя: "Не по плану"\nЯ: "Расслабься. Это лучше плана."', type:'tap', question:'🤖 Помоги Еве в костюме! (5 раз)', tapTarget:5, tapEmoji:'⚡', completeFeedback:'✅ Бамблби-Ева катается! Это войдёт в историю.', achievementOnComplete:'bumblebee' },
+        { chapter:'Глава 3 — Местный', bg:'assets/backgrounds/3_ciao.jpg.jpg', chars:['local'], title:'Этого Я Знаю', speaker:'Илья', text:'😶 Петя дёрнул меня и написал в блокноте: "Уходим. Сейчас. Девочек берём."\nПосмотрел на мужика в шляпе. Понял Петю.\n"Пошли пиццу есть!" — говорю девочкам.\n"Да!"\nМы ушли. Быстро.', type:'choice', question:'⚡ Как действовать?', options:['Пицца-манёвр 🍕','Прямо сказать 😤','Позвонить менеджеру 📞'], correct:0, correctFeedback:'✅ Пицца-манёвр работает всегда!', wrongFeedback:'❌ Лучше пицца.', screamer:true, achievementOnCorrect:'first_screamer' },
+        { chapter:'Глава 4 — Лёд', bg:'assets/backgrounds/12_skaters.jpg.jpg', chars:['ilya'], title:'Учу Кататься', speaker:'Илья', text:'⛸️ Предложил лёд. Ева согласилась ещё до конца фразы.\nУчу просто: держись за меня.\nЕва: "ДЕРЖИТЕ МЕНЯ!"\nЯ держу.\nЕва радуется как ребёнок. Это и есть любовь к фигурному катанию.', type:'tap', question:'⛸️ Поддержи Еву на льду! (7 раз)', tapTarget:7, tapEmoji:'🤝', completeFeedback:'❤️ Ева устояла! Благодаря Илье.' },
+        { chapter:'Глава 5 — Показательные', bg:'assets/backgrounds/7_bamblebee.jpg.jpg', chars:['ilya','petya'], title:'Выступление Бамблби', speaker:'Илья', text:'⚡ Я — Бамблби. Петя — синий трансформер.\nЕва в зале орёт "БАМБЛБЕЕЕЕ!"\nПолина снимает.\nЭто лучшее выступление в карьере. Не за технику — за людей в зале, которые орали от радости. Так и надо.', type:'tap', question:'⚡ Прыгни четверной! (4 раза)', tapTarget:4, tapEmoji:'💫', completeFeedback:'💫 ЧЕТВЕРНОЙ! Зал взрывается! Ева орёт громче всех!', achievementOnComplete:'quad_jump' },
+        { chapter:'Финал — До Свидания', bg:'assets/backgrounds/21_alabuga_final.jpg.jpg', chars:['ilya'], title:'Они Улетают', speaker:'Илья', text:'✈️ Посадка на рейс до Алабуги. Машем рукой.\nЕва: "Приезжайте к нам!"\nЯ: "А вы к нам на соревнования!"\n"Договорились!"\nПетя записывает в блокнот. Улыбаюсь.\nВот за этим и стоит путешествовать.', type:'tap', question:'👋 Помаши на прощание! (10 раз)', tapTarget:10, tapEmoji:'👋', completeFeedback:'❤️ Пока! До встречи! Италия запомнит этих девочек навсегда.', achievementOnComplete:'alabuga_hero', isLast:true }
+    ],
+    local: [
+        { chapter:'Пролог — Секретная Линия', bg:'assets/backgrounds/3_ciao.jpg.jpg', chars:['local'], title:'⚠️ Секретная История', speaker:'???', text:'🏝️ Все называют меня "Местный".\nЯ жил в Италии тихо. Занимался своими делами.\nИ вдруг — две русские девочки, которые знают только одно слово.\nОни говорят "Чау" с таким акцентом... что это мило.\nЯ не звал их на остров. Это слухи.', type:'story' },
+        { chapter:'Глава 1 — Встреча', bg:'assets/backgrounds/3_ciao.jpg.jpg', chars:['local'], title:'Они Спросили Дорогу', speaker:'???', text:'🗺️ Подошли и что-то спросили по-русски. Не понял ни слова кроме "Алабуга".\nСказал им "Чау!" и показал направление к центру.\nОни переглянулись. Рыжая покраснела. Та с косой потащила её прочь.\nМилые. Странные. Но милые.', type:'choice', question:'🗺️ Что им сказать?', options:['Чау! 🤌','Показать карту 🗺️','Позвать на пиццу 🍕'], correct:0, correctFeedback:'✅ "Чау" — всегда правильный ответ!', wrongFeedback:'❌ Они не поймут. "Чау" лучше.' },
+        { chapter:'Глава 2 — Наблюдение', bg:'assets/backgrounds/2_volleyball.jpg.jpg', chars:['local'], title:'Они На Волейболе', speaker:'???', text:'🏐 Видел их на стадионе. Рыжая орала по-русски — итальянцы оборачивались.\nКто-то смеялся. Кто-то был в шоке.\nВот настоящие болельщики. Без тормозов. Честные.\nЖаль что испугались и убежали. Я просто хотел угостить пиццей.', type:'story' },
+        { chapter:'Глава 3 — Про Слухи', bg:'assets/backgrounds/16_fans.jpg.jpg', chars:['local'], title:'Про Остров', speaker:'???', text:'🏝️ Говорят я звал их на остров.\nДопустим. У меня есть остров — красивый, с видом на море.\nПросто хотел угостить хорошим вином и показать закат.\nПо-моему это нормально?\nНо фигуристы их увели. Петя — умный парень. Всё правильно сделал.', type:'choice', question:'🏝️ Что думать?', options:['Всё окей 😌','Обидеться 😤','Написать в блокнот 📝'], correct:0, correctFeedback:'✅ Всё окей. Главное — они были счастливы.', wrongFeedback:'❌ Не стоит. Всё к лучшему.' },
+        { chapter:'Финал — Чау!', bg:'assets/backgrounds/19_airport.jpg.jpg', chars:['local'], title:'Аэропорт', speaker:'???', text:'✈️ Видел их в аэропорту. Издалека. Не подходил.\nРыжая что-то кричала. Та с косой держала вазу.\nОни улетели.\nПомахал рукой — никто не заметил.\n...Чауу, девочки. Возвращайтесь.', type:'tap', question:'🤌 Помаши им! (5 раз)', tapTarget:5, tapEmoji:'🤌', completeFeedback:'🤌 Чауу... Они не видели. Но Италия знает.', achievementOnComplete:'secret_ending', isLast:true }
+    ]
+};
 
-        // ==================== DOM ЭЛЕМЕНТЫ ====================
-        const sceneEl = document.getElementById('scene');
-        const lineText = document.getElementById('lineText');
-        const charRow = document.getElementById('characterRow');
-        const puzzleContent = document.getElementById('puzzleContent');
-        const sceneNameSpan = document.getElementById('sceneName');
-        const stepCounter = document.getElementById('stepCounter');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const audio = document.getElementById('bg-music');
-        const storyText = document.getElementById('storyText');
-        const modeIndicator = document.getElementById('modeIndicator');
-        const startBtn = document.getElementById('startBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const gameNav = document.getElementById('gameNav');
+const ACHIEVEMENTS = [
+    { id:'ciao_master', icon:'🤌', name:'Маэстро Чау', desc:'Сказал "Чау" как настоящий итальянец' },
+    { id:'first_screamer', icon:'😱', name:'Пережил Скример', desc:'Не испугался МЕСТНОГО' },
+    { id:'loud_eva', icon:'📣', name:'Голос Стадиона', desc:'Покричал за наших 7 раз' },
+    { id:'bumblebee', icon:'🤖', name:'Бамблби!', desc:'Примерил костюм трансформера' },
+    { id:'detective_polina', icon:'🔍', name:'Детектив Полина', desc:'Нашла потерянный чемодан' },
+    { id:'master_trader', icon:'💰', name:'Мастер Торговли', desc:'Купила вазу за 15 евро' },
+    { id:'quad_jump', icon:'💫', name:'Четверной!', desc:'Прыгнул четверной как Илья' },
+    { id:'secret_ending', icon:'🏝️', name:'Секретная Концовка', desc:'Прошёл игру за Местного' },
+    { id:'alabuga_hero', icon:'🏫', name:'Герой Алабуги', desc:'Завершил одну линию' },
+    { id:'all_heroes', icon:'👑', name:'Все Герои', desc:'Прошёл игру за всех персонажей' },
+];
 
-        // ==================== МУЗЫКА ====================
-        document.body.addEventListener('click', () => {
-            if (!musicPlayed) {
-                audio.play().catch(e => console.log('Автоплей блок'));
-                musicPlayed = true;
-            }
-        }, { once: true });
+let state = {
+    hero: null, sceneIdx: 0, score: 0,
+    tapCount: 0, tapTarget: 0, tapDone: false, choiceDone: false,
+    completedHeroes: [],
+    achievements: [],
+    musicOn: false, lyricsInterval: null
+};
 
-        // ==================== СТАРТ ИГРЫ ====================
-        startBtn.addEventListener('click', () => {
-            gameStarted = true;
-            currentScene = 0;
-            showingStory = true;
-            startBtn.classList.add('hidden');
-            restartBtn.classList.remove('hidden');
-            gameNav.style.display = 'flex';
-            renderScene();
+try { state.completedHeroes = JSON.parse(localStorage.getItem('ciao_completed') || '[]'); } catch(e) {}
+try { state.achievements = JSON.parse(localStorage.getItem('ciao_achievements') || '[]'); } catch(e) {}
+
+// ── CANVAS ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+const particles = Array.from({length:55}, () => ({
+    x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight,
+    r: Math.random()*1.5+0.3, dx:(Math.random()-0.5)*0.25, dy:-Math.random()*0.18-0.08, alpha:Math.random()
+}));
+function animateP() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,214,0,${p.alpha*0.45})`; ctx.fill();
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.y<0){p.y=canvas.height;p.x=Math.random()*canvas.width;}
+    });
+    requestAnimationFrame(animateP);
+}
+animateP();
+
+// ── HELPERS ──
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+    document.getElementById('screen-'+id).classList.remove('hidden');
+}
+
+function flash() {
+    const f=document.getElementById('flash');
+    f.style.transition=''; f.style.opacity='1';
+    setTimeout(()=>{f.style.transition='opacity 0.4s';f.style.opacity='0';},60);
+}
+
+function triggerScreamer() {
+    const s=document.getElementById('screamer');
+    const msgs=['😱','👁️','⚠️','💀'];
+    document.getElementById('screamer-text').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    s.classList.add('active');
+    try{
+        const ac=new AudioContext(), osc=ac.createOscillator(), g=ac.createGain();
+        osc.connect(g); g.connect(ac.destination);
+        osc.frequency.setValueAtTime(60,ac.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(280,ac.currentTime+0.25);
+        g.gain.setValueAtTime(0.25,ac.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.9);
+        osc.start(); osc.stop(ac.currentTime+0.9);
+    }catch(e){}
+    setTimeout(()=>s.classList.remove('active'),1400);
+}
+
+function burstCiao(x,y) {
+    const el=document.createElement('div');
+    el.className='ciao-burst'; el.style.left=x+'px'; el.style.top=y+'px';
+    const bursts=['🤌 ЧАУ!','⭐','✨','🎉'];
+    el.textContent=bursts[Math.floor(Math.random()*bursts.length)];
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),800);
+}
+
+// ── ACHIEVEMENTS ──
+function unlockAchievement(id) {
+    if(state.achievements.includes(id)) return;
+    state.achievements.push(id);
+    try{localStorage.setItem('ciao_achievements',JSON.stringify(state.achievements));}catch(e){}
+    const a=ACHIEVEMENTS.find(x=>x.id===id);
+    if(!a) return;
+    const t=document.getElementById('ach-toast');
+    document.getElementById('toast-icon').textContent=a.icon;
+    document.getElementById('toast-name').textContent=a.name;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3200);
+    renderAchPanel();
+}
+
+function renderAchPanel() {
+    document.getElementById('ach-list').innerHTML=ACHIEVEMENTS.map(a=>{
+        const u=state.achievements.includes(a.id);
+        return `<div class="ach-item ${u?'':'ach-locked'}">
+            <div class="ach-icon">${a.icon}</div>
+            <div><div class="ach-name">${u?a.name:'???'}</div><div class="ach-desc">${u?a.desc:'Ещё не разблокировано'}</div></div>
+        </div>`;
+    }).join('');
+}
+
+// ── TITLE ──
+document.getElementById('title-chars-preview').innerHTML=HEROES.map(h=>
+    `<img src="${h.img}" class="title-char-avatar" title="${h.name}" onerror="this.style.opacity='0'">`
+).join('');
+
+// ── CHAR SELECT ──
+let selectedHero=null;
+function initCharSelect() {
+    selectedHero=null;
+    document.getElementById('btn-play-char').disabled=true;
+    const grid=document.getElementById('chars-grid');
+    grid.innerHTML=HEROES.map(h=>{
+        const done=state.completedHeroes.includes(h.id);
+        return `<div class="char-card" data-id="${h.id}">
+            ${done?'<div class="char-badge">✅</div>':''}
+            <img src="${h.img}" class="char-avatar" onerror="this.style.background='#333'">
+            <div class="char-name">${h.emoji} ${h.name}</div>
+            <div class="char-desc">${h.desc}</div>
+            <div class="char-tag">${h.tag}</div>
+        </div>`;
+    }).join('');
+    grid.querySelectorAll('.char-card').forEach(card=>{
+        card.addEventListener('click',()=>{
+            grid.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedHero=card.dataset.id;
+            document.getElementById('btn-play-char').disabled=false;
         });
+    });
+}
 
-        restartBtn.addEventListener('click', () => {
-            if (confirm('Начать заново? Всё прогресс сбросится!')) {
-                currentScene = 0;
-                ciaoCount = 0;
-                alabugaCount = 0;
-                feedbackMsg = "";
-                finalPersonality = null;
-                showingStory = true;
-                renderScene();
-            }
-        });
+// ── GAME ──
+function startGame(heroId) {
+    state.hero=heroId; state.sceneIdx=0; state.score=0;
+    state.tapCount=0; state.tapDone=false; state.choiceDone=false;
+    const h=HEROES.find(x=>x.id===heroId);
+    document.getElementById('topbar-hero-img').src=h.img;
+    document.getElementById('topbar-hero-name').textContent=h.name;
+    showScreen('game');
+    renderScene();
+}
 
-        // ==================== РЕНДЕР ====================
-        function renderScene() {
-            if (!gameStarted) return;
+function renderScene() {
+    const scenes=SCENES[state.hero];
+    const scene=scenes[state.sceneIdx];
+    if(!scene) return;
+    state.tapCount=0; state.tapDone=false; state.choiceDone=false;
 
-            const scene = scenes[currentScene];
-            
-            // Фон
-            sceneEl.style.backgroundImage = `url('${scene.bg}')`;
-            
-            // Персонажи
-            charRow.innerHTML = scene.characters.map(c => `
-                <div class="character-card">
-                    <img src="${c.img}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/50'">
-                    <span>${c.name}</span>
-                </div>
-            `).join('');
+    document.getElementById('game-bg').style.backgroundImage=`url('${scene.bg}')`;
+    document.getElementById('hud-chapter').textContent=scene.chapter||'';
+    document.getElementById('hud-score').textContent='⭐ '+state.score;
+    document.getElementById('prog-fill').style.width=((state.sceneIdx/(scenes.length-1))*100)+'%';
 
-            stepCounter.innerText = `${currentScene+1}/${scenes.length}`;
-            sceneNameSpan.innerText = `Сцена ${currentScene+1}`;
-            prevBtn.disabled = (currentScene === 0);
+    const charsEl=document.getElementById('scene-chars');
+    charsEl.innerHTML=(scene.chars||[]).map(cid=>{
+        const h=HEROES.find(x=>x.id===cid);
+        if(!h) return '';
+        return `<div class="scene-char-bubble"><img src="${h.img}" class="scene-char-img" onerror="this.style.display='none'"><div class="scene-char-name">${h.name}</div></div>`;
+    }).join('');
 
-            if (showingStory) {
-                // Показываем историю
-                lineText.innerText = scene.line;
-                storyText.style.display = 'block';
-                storyText.innerText = scene.story;
-                modeIndicator.innerText = '📖 РЕЖИМ: ИСТОРИЯ';
-                modeIndicator.style.background = '#FF6B9D';
-                
-                // В режиме истории показываем заглушку
-                puzzleContent.innerHTML = `
-                    <div style="color: #FF6B9D; padding: 20px; font-size: 1.2rem;">
-                        📜 Почитай историю, потом нажми ДАЛЕЕ для игры!
-                    </div>
-                `;
-            } else {
-                // Показываем игру
-                storyText.style.display = 'none';
-                modeIndicator.innerText = '🎮 РЕЖИМ: ИГРА';
-                modeIndicator.style.background = 'gold';
-                modeIndicator.style.color = '#1A1A2E';
-                renderPuzzle(scene.puzzle);
-            }
-        }
+    const dial=document.getElementById('game-dialogue');
+    dial.innerHTML=`
+        <div class="chapter-title">${scene.chapter||''}</div>
+        <div class="story-box${scene.type==='story'?'':' highlight'}">
+            ${scene.speaker?`<div class="speaker-label">💬 ${scene.speaker}</div>`:''}
+            <div>${(scene.text||'').replace(/\n/g,'<br>')}</div>
+        </div>`;
 
-        function renderPuzzle(puzzle) {
-            if (!puzzle) {
-                puzzleContent.innerHTML = `<div>✨</div>`;
-                return;
-            }
+    const choicesEl=document.getElementById('game-choices');
+    choicesEl.innerHTML='';
 
-            let html = `<div style="margin-bottom:10px;">${puzzle.question || ''}</div>`;
-
-            if (puzzle.type === 'choice') {
-                html += `<div class="puzzle-options">`;
-                puzzle.options.forEach((opt, i) => {
-                    html += `<button class="puzzle-btn" data-choice="${i}">${opt}</button>`;
-                });
-                html += `</div>`;
-            }
-            else if (puzzle.type === 'ciao' || puzzle.type === 'epstein') {
-                html += `
-                    <div style="text-align:center;">
-                        <button class="puzzle-btn ${puzzle.type === 'epstein' ? 'epstein' : 'special'}" id="ciaoBtn">
-                            ${puzzle.type === 'epstein' ? '🏝️ ЧАУ 🤌' : '🤌 ЧАУ 🤌'}
-                        </button>
-                        ${puzzle.type === 'ciao' ? `<div style="font-size:2rem; margin:10px;">${ciaoCount}/${puzzle.required}</div>` : ''}
-                        ${puzzle.type === 'epstein' ? '<div style="margin-top:10px; color: gold;">ТОТ САМЫЙ?! 😱</div>' : ''}
-                    </div>
-                `;
-            }
-            else if (puzzle.type === 'shout') {
-                html += `<div class="puzzle-options">`;
-                puzzle.options.forEach((opt, i) => {
-                    html += `<button class="puzzle-btn" data-shout="${i}">${opt}</button>`;
-                });
-                html += `</div>`;
-            }
-            else if (puzzle.type === 'strateg') {
-                html += `<div class="puzzle-options">`;
-                puzzle.options.forEach((opt, i) => {
-                    html += `<button class="puzzle-btn" data-strateg="${i}">${opt}</button>`;
-                });
-                html += `</div>`;
-            }
-            else if (puzzle.type === 'click' || puzzle.type === 'pizza' || puzzle.type === 'gondola' || puzzle.type === 'pack' || puzzle.type === 'board') {
-                html += `<div class="puzzle-options">`;
-                puzzle.options.forEach((opt, i) => {
-                    html += `<button class="puzzle-btn" data-action="${i}">${opt}</button>`;
-                });
-                html += `</div>`;
-            }
-            else if (puzzle.type === 'alabuga') {
-                html += `
-                    <div style="text-align:center;">
-                        <button class="puzzle-btn special" id="alabugaBtn" style="font-size:2rem; padding:20px; animation: pulse 1s infinite;">🏫 АЛАБУГА ПОЛИТЕХ 🏫</button>
-                        <div class="alabuga-counter">${alabugaCount}/${puzzle.required}</div>
-                        ${finalPersonality ? `
-                            <div style="margin-top:20px;">
-                                <img src="${finalPersonality.img}" style="width:150px; height:150px; border-radius:12px; border:5px solid gold;" onerror="this.src='https://via.placeholder.com/150'">
-                                <div style="font-size:2rem; color:gold;">${finalPersonality.name}</div>
-                                <div style="color:white;">${finalPersonality.desc}</div>
-                                <button class="puzzle-btn restart-btn" id="playAgainBtn" style="margin-top:20px;">🔄 СЫГРАТЬ ЕЩЁ</button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-
-            if (feedbackMsg) {
-                html += `<div class="feedback">🎭 ${feedbackMsg}</div>`;
-            }
-
-            puzzleContent.innerHTML = html;
-            attachPuzzleEvents(puzzle);
-        }
-
-        function attachPuzzleEvents(puzzle) {
-            if (!puzzle) return;
-
-            // Choice
-            document.querySelectorAll('[data-choice]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const idx = parseInt(e.target.dataset.choice);
-                    if (idx === puzzle.correct) {
-                        feedbackMsg = '✅ Верно! ' + getRandomPraise();
-                    } else {
-                        feedbackMsg = '❌ Неа! ' + getRandomFail();
-                    }
-                    renderScene();
-                });
-            });
-
-            // Shout
-            document.querySelectorAll('[data-shout]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    feedbackMsg = '*** БИИП! *** (итальянцы в шоке, русские в восторге!)';
-                    renderScene();
-                });
-            });
-
-            // Strateg
-            document.querySelectorAll('[data-strateg]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const idx = parseInt(e.target.dataset.strateg);
-                    if (idx === puzzle.correct) {
-                        feedbackMsg = '✅ Стратег одобряет! План - пицца!';
-                    } else {
-                        feedbackMsg = '❌ Не тот план. Петя недоволен.';
-                    }
-                    renderScene();
-                });
-            });
-
-            // Action
-            document.querySelectorAll('[data-action]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    feedbackMsg = '✅ Готово! ' + getRandomDone();
-                    renderScene();
-                });
-            });
-
-            // Ciao / Epstein
-            const ciaoBtn = document.getElementById('ciaoBtn');
-            if (ciaoBtn) {
-                ciaoBtn.addEventListener('click', () => {
-                    if (puzzle.type === 'ciao') {
-                        if (ciaoCount < puzzle.required) {
-                            ciaoCount++;
-                            feedbackMsg = `Чау! (${ciaoCount}/${puzzle.required})`;
-                            if (ciaoCount === 3) feedbackMsg = '🤌 Классно получается!';
-                            if (ciaoCount === 5) feedbackMsg = '🎉 Ты теперь почётный итальянец!';
-                        }
-                    } else if (puzzle.type === 'epstein') {
-                        feedbackMsg = '🏝️ ОН ПРИГЛАШАЕТ НА ОСТРОВ! БЕЖИМ!!!';
-                    }
-                    renderScene();
-                });
-            }
-
-            // Alabuga mega clicker
-            const alabugaBtn = document.getElementById('alabugaBtn');
-            if (alabugaBtn) {
-                alabugaBtn.addEventListener('click', () => {
-                    if (alabugaCount < puzzle.required) {
-                        alabugaCount++;
-                        if (alabugaCount === 3) feedbackMsg = '💪 Алабуга зовёт!';
-                        if (alabugaCount === 7) feedbackMsg = '🔥 Ещё немного!';
-                        if (alabugaCount === 9) feedbackMsg = '⚡ ПОСЛЕДНИЙ РАЗ!';
-                    }
-                    if (alabugaCount >= puzzle.required && !finalPersonality) {
-                        const rand = Math.floor(Math.random() * personalities.length);
-                        finalPersonality = personalities[rand];
-                        feedbackMsg = `🎉 ТЫ ПОЛУЧИЛ: ${finalPersonality.name}!`;
-                    }
-                    renderScene();
-                });
-            }
-
-            // Play again
-            const playAgainBtn = document.getElementById('playAgainBtn');
-            if (playAgainBtn) {
-                playAgainBtn.addEventListener('click', () => {
-                    restartBtn.click();
-                });
-            }
-        }
-
-        // ==================== СМЕШНЫЕ ФРАЗЫ ====================
-        function getRandomPraise() {
-            const phrases = [
-                'Петя гордится тобой!', 
-                'Ева одобряет!', 
-                'Полина: "Ну ты крут!"',
-                'Илья: "Четверной от тебя!"',
-                'Бамблби жужжит от радости!'
-            ];
-            return phrases[Math.floor(Math.random() * phrases.length)];
-        }
-
-        function getRandomFail() {
-            const phrases = [
-                'Петя: "Стратегия подвела"', 
-                'Ева: "Ты дура?"', 
-                'Полина: "Ну ты тупишь..."',
-                'Илья упал с четверного',
-                'Бамблби заглох'
-            ];
-            return phrases[Math.floor(Math.random() * phrases.length)];
-        }
-
-        function getRandomDone() {
-            const phrases = [
-                'Пицца съедена!', 
-                'Ваза куплена!', 
-                'Гондола уплыла!',
-                'Чемодан нашёлся!',
-                'Итальянцы счастливы!'
-            ];
-            return phrases[Math.floor(Math.random() * phrases.length)];
-        }
-
-        // ==================== НАВИГАЦИЯ ====================
-        function goNext() {
-            if (!gameStarted) return;
-            
-            if (showingStory) {
-                // Переключаемся с истории на игру
-                showingStory = false;
-            } else {
-                // Переходим на следующую сцену
-                if (currentScene < scenes.length - 1) {
-                    if (scenes[currentScene].puzzle?.type === 'ciao') ciaoCount = 0;
-                    if (scenes[currentScene].puzzle?.type === 'alabuga') {
-                        alabugaCount = 0;
-                        finalPersonality = null;
-                    }
-                    feedbackMsg = '';
-                    currentScene++;
-                    showingStory = true; // На новой сцене сначала история
-                }
-            }
-            renderScene();
-        }
-
-        function goPrev() {
-            if (!gameStarted) return;
-            
-            if (currentScene > 0) {
-                if (showingStory) {
-                    // Если мы в истории, просто переходим на предыдущую сцену
-                    currentScene--;
-                    showingStory = true;
+    if(scene.type==='choice') {
+        choicesEl.innerHTML=`
+            <div class="choice-question">${scene.question||''}</div>
+            <div class="choices-row" id="choices-row">
+                ${(scene.options||[]).map((opt,i)=>`<button class="choice-btn" data-idx="${i}">${opt}</button>`).join('')}
+            </div>
+            <div id="choice-feedback" style="text-align:center;color:#888;font-size:0.82rem;margin-top:6px;min-height:20px;"></div>`;
+        document.querySelectorAll('.choice-btn').forEach(btn=>{
+            btn.addEventListener('click',e=>{
+                if(state.choiceDone) return;
+                const idx=parseInt(e.currentTarget.dataset.idx);
+                const ok=idx===scene.correct;
+                if(ok) {
+                    e.currentTarget.classList.add('correct');
+                    state.score+=10; document.getElementById('hud-score').textContent='⭐ '+state.score;
+                    state.choiceDone=true;
+                    document.getElementById('choice-feedback').textContent=scene.correctFeedback||'✅ Правильно!';
+                    document.getElementById('choice-feedback').style.color='var(--teal)';
+                    document.querySelectorAll('.choice-btn').forEach(b=>b.classList.add('disabled'));
+                    if(scene.achievementOnCorrect) unlockAchievement(scene.achievementOnCorrect);
+                    flash();
                 } else {
-                    // Если мы в игре, возвращаемся к истории этой же сцены
-                    showingStory = true;
+                    e.currentTarget.classList.add('wrong');
+                    document.getElementById('choice-feedback').textContent=scene.wrongFeedback||'❌ Попробуй ещё!';
+                    document.getElementById('choice-feedback').style.color='var(--pink)';
+                    setTimeout(()=>e.currentTarget.classList.remove('wrong'),380);
                 }
-                
-                if (scenes[currentScene].puzzle?.type === 'ciao') ciaoCount = 0;
-                if (scenes[currentScene].puzzle?.type === 'alabuga') {
-                    alabugaCount = 0;
-                    finalPersonality = null;
-                }
-                feedbackMsg = '';
-                renderScene();
+                if(scene.screamer) setTimeout(triggerScreamer,ok?200:100);
+            });
+        });
+    } else if(scene.type==='tap') {
+        state.tapTarget=scene.tapTarget||5;
+        choicesEl.innerHTML=`
+            <div class="minigame-box">
+                <div class="minigame-title">${scene.question||'Нажми!'}</div>
+                <button class="big-tap-btn" id="tap-btn">${scene.tapEmoji||'👆'}</button>
+                <div class="tap-counter"><span id="tap-count">0</span>/${state.tapTarget}</div>
+                <div class="tap-progress"><div class="tap-progress-bar" id="tap-bar" style="width:0%"></div></div>
+                <div id="tap-feedback" style="text-align:center;color:var(--teal);font-size:0.78rem;margin-top:6px;min-height:18px;"></div>
+            </div>`;
+        document.getElementById('tap-btn').addEventListener('click',e=>{
+            if(state.tapDone) return;
+            state.tapCount++;
+            document.getElementById('tap-count').textContent=state.tapCount;
+            document.getElementById('tap-bar').style.width=(state.tapCount/state.tapTarget*100)+'%';
+            burstCiao(e.clientX||window.innerWidth/2, e.clientY||window.innerHeight/2);
+            if(state.tapCount>=state.tapTarget) {
+                state.tapDone=true; state.score+=15;
+                document.getElementById('hud-score').textContent='⭐ '+state.score;
+                document.getElementById('tap-feedback').textContent=scene.completeFeedback||'✅ Готово!';
+                document.getElementById('tap-btn').style.animation='none';
+                if(scene.achievementOnComplete) unlockAchievement(scene.achievementOnComplete);
+                flash();
             }
-        }
+        });
+    }
 
-        nextBtn.addEventListener('click', goNext);
-        prevBtn.addEventListener('click', goPrev);
-    </script>
+    document.getElementById('btn-prev').disabled=state.sceneIdx===0;
+    document.getElementById('btn-next').textContent=scene.isLast?'ФИНАЛ 🎉':'ДАЛЕЕ ▶';
+    setTimeout(()=>{dial.scrollTop=0;},40);
+}
+
+function nextScene() {
+    const scenes=SCENES[state.hero];
+    const scene=scenes[state.sceneIdx];
+    if(scene.type==='choice' && !state.choiceDone) {
+        const fb=document.getElementById('choice-feedback');
+        if(fb){fb.textContent='👆 Сначала выбери ответ!';fb.style.color='var(--gold)';}
+        return;
+    }
+    if(scene.type==='tap' && !state.tapDone) {
+        const fb=document.getElementById('tap-feedback');
+        if(fb){fb.textContent='👆 Нажми нужное количество раз!';fb.style.color='var(--gold)';}
+        return;
+    }
+    if(scene.isLast){endGame();return;}
+    state.sceneIdx++;
+    renderScene();
+}
+
+function prevScene() {
+    if(state.sceneIdx>0){state.sceneIdx--;renderScene();}
+}
+
+// ── END ──
+function endGame() {
+    if(!state.completedHeroes.includes(state.hero)){
+        state.completedHeroes.push(state.hero);
+        try{localStorage.setItem('ciao_completed',JSON.stringify(state.completedHeroes));}catch(e){}
+    }
+    if(state.completedHeroes.length>=HEROES.length) unlockAchievement('all_heroes');
+    const h=HEROES.find(x=>x.id===state.hero);
+    document.getElementById('end-emoji').textContent=h.emoji;
+    document.getElementById('end-title').textContent='Конец! За '+h.name;
+    document.getElementById('end-desc').textContent=`Ты прошёл(а) игру за ${h.name}! Очков: ${state.score}. Одна история — но сколько разных взглядов! Попробуй за другого персонажа.`;
+    document.getElementById('end-personality').innerHTML=`
+        <img src="${h.finalImg}" class="end-personality-img" onerror="this.style.display='none'">
+        <div class="end-personality-name">${h.emoji} ${h.name}</div>
+        <div style="color:rgba(255,255,255,0.55);font-size:0.82rem;">${h.tag}</div>
+        <div style="margin-top:7px;color:var(--teal);font-size:0.75rem;">Пройдено ${state.completedHeroes.length}/${HEROES.length} линий</div>`;
+    document.getElementById('end-achievements').innerHTML=state.achievements.map(id=>{
+        const a=ACHIEVEMENTS.find(x=>x.id===id);
+        return a?`<div class="ach-chip">${a.icon} ${a.name}</div>`:'';
+    }).join('');
+    const remaining=HEROES.filter(h=>!state.completedHeroes.includes(h.id));
+    const btn=document.getElementById('btn-try-other');
+    if(remaining.length>0){btn.textContent=`🔄 Пройти за ${remaining[0].emoji} ${remaining[0].name}`;btn.disabled=false;}
+    else{btn.textContent='👑 Все персонажи пройдены!';btn.disabled=true;}
+    showScreen('end');
+}
+
+// ── MUSIC ──
+const audio=document.getElementById('bg-music');
+const musicFab=document.getElementById('music-fab');
+const LYRICS=[
+    'Ева и Полина летели в Алабугу Политех...',
+    'Но случайно попали в Италию 🇮🇹',
+    'Они решили пойти на Олимпиаду...',
+    'Но фигурное катание уже прошло!',
+    'Ева предложила пойти смотреть волейбол 🏐',
+    'Полина: "Какой волейбол на ЗИМНЕЙ Олимпиаде?!"',
+    'В Дуолинго их не научили ничему кроме...',
+    'ЧАУ! 🤌',
+    'И всем говорили только это!',
+    'Наши проигрывают...',
+    'Ева начала орать матом по-русски 😱',
+    'Девочки, вы знаете русский? 🇷🇺',
+    'Это Илья Малинин и Пётр Гуменников! ⚡',
+    'Про ЕГЭ, Бамблби и показательные!',
+    'ЧАУ-ШАУ! 🤌🤌🤌',
+];
+let lyricIdx=0;
+function rotateLyrics(){
+    const el=document.getElementById('lyrics-text');
+    if(el) el.textContent=LYRICS[lyricIdx%LYRICS.length];
+    lyricIdx++;
+}
+
+function toggleMusic(){
+    if(state.musicOn){
+        audio.pause(); state.musicOn=false; musicFab.textContent='🔇';
+        document.getElementById('lyrics-bar').style.display='none';
+        clearInterval(state.lyricsInterval);
+    } else {
+        audio.play().then(()=>{
+            state.musicOn=true; musicFab.textContent='🎵';
+            document.getElementById('lyrics-bar').style.display='block';
+            rotateLyrics();
+            state.lyricsInterval=setInterval(rotateLyrics,4500);
+        }).catch(()=>{});
+    }
+}
+musicFab.addEventListener('click',toggleMusic);
+
+// ── EVENTS ──
+document.getElementById('btn-to-select').addEventListener('click',()=>{
+    showScreen('select'); initCharSelect();
+    if(!state.musicOn) toggleMusic();
+});
+document.getElementById('btn-play-char').addEventListener('click',()=>{
+    if(selectedHero) startGame(selectedHero);
+});
+document.getElementById('btn-next').addEventListener('click',nextScene);
+document.getElementById('btn-prev').addEventListener('click',prevScene);
+document.getElementById('btn-try-other').addEventListener('click',()=>{showScreen('select');initCharSelect();});
+document.getElementById('btn-restart-same').addEventListener('click',()=>{startGame(state.hero);});
+document.getElementById('btn-ach').addEventListener('click',()=>{renderAchPanel();document.getElementById('ach-panel').classList.toggle('open');});
+document.getElementById('ach-close').addEventListener('click',()=>document.getElementById('ach-panel').classList.remove('open'));
+document.getElementById('btn-menu').addEventListener('click',()=>{
+    if(confirm('Вернуться к выбору персонажа?')){showScreen('select');initCharSelect();}
+});
+document.getElementById('screamer').addEventListener('click',()=>document.getElementById('screamer').classList.remove('active'));
+
+// ── INIT ──
+renderAchPanel();
+showScreen('title');
+</script>
 </body>
 </html>
